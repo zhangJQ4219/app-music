@@ -4,3 +4,7 @@ $bg: #999;
   overflow: hidden;
   white-space: nowrap;
 }
+@function rem($px) {
+  $rem: 37.5;
+  @return ($px / $rem ) + rem;
+}

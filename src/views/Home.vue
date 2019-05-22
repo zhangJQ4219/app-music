@@ -32,7 +32,7 @@ export default {
 <style lang="scss" scoped>
   @import '~/style/variables.scss';
   .home{
-    width: 100px;
+    width: rem(100);
     height: 100px;
     background-color: $bg;
     @include ellipsis;
