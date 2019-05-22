@@ -7,8 +7,27 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: () => import('../views/Home.vue')
+      redirect: '/recommend'
+    },
+    {
+      path: '/recommend',
+      name: 'recommend',
+      component: () => import('../views/recommend/Recommend.vue')
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: () => import('../views/search/Search.vue')
+    },
+    {
+      path: '/rank',
+      name: 'rank',
+      component: () => import('../views/rank/Rank.vue')
+    },
+    {
+      path: '/singer',
+      name: 'singer',
+      component: () => import('../views/singer/Singer.vue')
     }
   ]
 })
