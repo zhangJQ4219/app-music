@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import './cube-ui'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -10,6 +11,8 @@ import './assets/style/reset.css'
 import './assets/style/border.css'
 // 解决300毫秒延迟
 import fastclick from 'fastclick'
+// 引入iconfont
+import './assets/iconfont/iconfont.css'
 
 fastclick.attach(document.body)
 

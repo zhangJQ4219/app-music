@@ -6,10 +6,28 @@ module.exports = {
   devServer: {
     host: '0.0.0.0'
   },
+
   lintOnSave: true,
+
   chainWebpack: (config) => {
     config.resolve.alias
       .set('@', resolve('src'))
       .set('~', resolve('src/assets'))
+  },
+
+  css: {
+    loaderOptions: {
+      stylus: {
+        'resolve url': true,
+        'import': []
+      }
+    }
+  },
+
+  pluginOptions: {
+    'cube-ui': {
+      postCompile: true,
+      theme: false
+    }
   }
 }

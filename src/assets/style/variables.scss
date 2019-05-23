@@ -1,5 +1,6 @@
-$bg: #333;
-$font-color: rgb(81, 165, 158);
+$bg: #eee; // 整体背景色
+$text-color1: #999; // 字体颜色-淡
+$text-color2: #333; // 字体颜色-深
 @mixin  ellipsis() {
   text-overflow: ellipsis;
   overflow: hidden;
