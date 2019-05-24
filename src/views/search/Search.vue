@@ -8,7 +8,6 @@
         <div class="fontFamily search-icon">&#xe638;</div>
       </div>
     </div>
-    {{keywords}}
     <div class="search-content">
       <div class="search-content-title">
         <h1>热门搜索</h1>
