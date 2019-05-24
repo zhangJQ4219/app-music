@@ -13,6 +13,7 @@ module.exports = {
     config.resolve.alias
       .set('@', resolve('src'))
       .set('~', resolve('src/assets'))
+      .set('api', resolve('src/api'))
   },
 
   css: {

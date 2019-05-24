@@ -34,6 +34,9 @@
 import MHeader from '../../components/m-header'
 import RecommendItem from './components/recommend-item'
 import BScroll from 'better-scroll'
+
+import { getTest } from 'api/music.js'
+
 export default {
   data () {
     return {
@@ -75,6 +78,13 @@ export default {
   },
   mounted () {
     this.scroll = new BScroll(this.$refs.wrapper, { click: true })
+    getTest().then(res => {
+      // let a = []
+      // res.data.slider.map((item, index) => {
+      //   a[index] = { 'image': item }
+      // })
+      // this.items = a
+    })
   }
 }
 </script>
@@ -88,7 +98,7 @@ export default {
     right: 0;
     bottom: 0;
     overflow: hidden;
-    background: #eee;
+    background: $bg;
     .slide{
       margin: 0 rem(16);
       border-radius: rem(10);
@@ -108,7 +118,8 @@ export default {
         flex: 1;
         text-align: center;
         color: $text-color1;
-        margin-bottom: rem(10);
+        padding-bottom: rem(10);
+        cursor: pointer;
         .tab-icon{
           font-size: rem(28);
           margin: rem(10) 0;
