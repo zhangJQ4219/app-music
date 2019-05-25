@@ -5,3 +5,10 @@ export function getTest () {
     method: 'get'
   })
 }
+
+export function getSlider () {
+  return request({
+    url: '/api/getSlider',
+    method: 'get'
+  })
+}

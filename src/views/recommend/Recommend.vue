@@ -3,7 +3,7 @@
     <div>
       <m-header></m-header>
       <div class="slide">
-        <cube-slide :data="items">
+        <cube-slide :data="items" :autoPlay="false">
           <template slot="dots" slot-scope="props">
             <span class="my-dot" :class="{active: props.current === index}" v-for="(item, index) in props.dots" :key="item">{{index + 1}}</span>
           </template>
@@ -35,24 +35,24 @@ import MHeader from '../../components/m-header'
 import RecommendItem from './components/recommend-item'
 import BScroll from 'better-scroll'
 
-import { getTest } from 'api/music.js'
+import { getSlider } from 'api/music.js'
 
 export default {
   data () {
     return {
       items: [
-        {
-          url: 'http://www.didichuxing.com/',
-          image: '//webapp.didistatic.com/static/webapp/shield/cube-ui-examples-slide01.png'
-        },
-        {
-          url: 'http://www.didichuxing.com/',
-          image: '//webapp.didistatic.com/static/webapp/shield/cube-ui-examples-slide02.png'
-        },
-        {
-          url: 'http://www.didichuxing.com/',
-          image: '//webapp.didistatic.com/static/webapp/shield/cube-ui-examples-slide03.png'
-        }
+        // {
+        //   url: 'http://www.didichuxing.com/',
+        //   image: '//webapp.didistatic.com/static/webapp/shield/cube-ui-examples-slide01.png'
+        // },
+        // {
+        //   url: 'http://www.didichuxing.com/',
+        //   image: '//webapp.didistatic.com/static/webapp/shield/cube-ui-examples-slide02.png'
+        // },
+        // {
+        //   url: 'http://www.didichuxing.com/',
+        //   image: '//webapp.didistatic.com/static/webapp/shield/cube-ui-examples-slide03.png'
+        // }
       ],
       list: [
         '啊啊啊啊啊啊啊啊',
@@ -75,22 +75,29 @@ export default {
     MHeader
   },
   created () {
+    getSlider().then(res => {
+      let a = []
+      let data = JSON.parse(res.body).data
+      data.slider.map((item, index) => {
+        a[index] = { 'url': item.linkUrl, 'image': item.picUrl }
+      })
+      this.items = a
+    })
   },
   mounted () {
     this.scroll = new BScroll(this.$refs.wrapper, { click: true })
-    getTest().then(res => {
-      // let a = []
-      // res.data.slider.map((item, index) => {
-      //   a[index] = { 'image': item }
-      // })
-      // this.items = a
-    })
+    // 获取轮播图
   }
 }
 </script>
 
-<style lang='scss' >
+<style lang='scss' scoped>
 @import '~/style/variables.scss';
+.slide /deep/ .cube-slide-item{
+  img{
+    width: rem(343);
+  }
+}
   .recommend{
     position: absolute;
     left: 0;
@@ -100,6 +107,9 @@ export default {
     overflow: hidden;
     background: $bg;
     .slide{
+      // width: rem(343);
+      height: rem(150);
+      box-sizing: border-box;
       margin: 0 rem(16);
       border-radius: rem(10);
       overflow: hidden;
@@ -121,6 +131,7 @@ export default {
         padding-bottom: rem(10);
         cursor: pointer;
         .tab-icon{
+          color: #31c27c;
           font-size: rem(28);
           margin: rem(10) 0;
         }
