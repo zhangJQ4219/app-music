@@ -24,7 +24,7 @@
         </router-link>
       </div>
       <div class="">
-        <recommend-item :list="list" v-for="i in 3" :key="i"></recommend-item>
+        <recommend-item :list="item" v-for="(item, index) in list" :key="index"></recommend-item>
       </div>
     </div>
   </div>
@@ -35,7 +35,7 @@ import MHeader from '../../components/m-header'
 import RecommendItem from './components/recommend-item'
 import BScroll from 'better-scroll'
 
-import { getSlider } from 'api/music.js'
+import { getTest, getRecommend, getSlider } from 'api/music.js'
 
 export default {
   data () {
@@ -54,20 +54,7 @@ export default {
         //   image: '//webapp.didistatic.com/static/webapp/shield/cube-ui-examples-slide03.png'
         // }
       ],
-      list: [
-        '啊啊啊啊啊啊啊啊',
-        '不不不不不不不不',
-        '啛啛喳喳错错错错',
-        '顶顶顶顶顶大大大',
-        '鹅鹅鹅饿鹅鹅鹅饿',
-        '嘎嘎嘎灌灌灌灌灌',
-        '哈哈哈哈哈哈哈哈',
-        '急急急就将计就计',
-        '咔咔咔咔咔咔扩扩',
-        '啦啦啦啦啦啦啦啦',
-        '么么么么么么么么',
-        '那你那你女女女女'
-      ]
+      list: []
     }
   },
   components: {
@@ -75,6 +62,9 @@ export default {
     MHeader
   },
   created () {
+    // getTest().then(res => {
+    //   console.log(res)
+    // })
     getSlider().then(res => {
       let a = []
       let data = JSON.parse(res.body).data
@@ -82,6 +72,9 @@ export default {
         a[index] = { 'url': item.linkUrl, 'image': item.picUrl }
       })
       this.items = a
+    })
+    getRecommend().then(res => {
+      this.list = res.data
     })
   },
   mounted () {

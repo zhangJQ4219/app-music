@@ -5,6 +5,16 @@ function resolve (dir) {
 module.exports = {
   devServer: {
     host: '0.0.0.0',
+    // proxy: {
+    //   '/': {
+    //     target: 'https://y.qq.com',
+    //     changeOrigin: true,
+    //     ws: true,
+    //     pathRewrite: {
+    //       '^/': ''
+    //     }
+    //   }
+    // }
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:3001',

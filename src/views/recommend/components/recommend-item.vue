@@ -1,19 +1,22 @@
 <template>
   <div>
     <div class="title">
-      <span>为你推荐歌单</span>
+      <span>{{list.title}}</span>
       <div class="fontFamily tab-icon">更多 &#xe671;</div>
     </div>
     <cube-scroll
       ref="scroll"
-      :data="list"
+      :data="list.list"
       direction="horizontal"
       class="horizontal-scroll-list-wrap">
       <ul class="list-wrapper">
-        <li v-for="item in list" class="list-item" :key="item">
+        <li v-for="item in list.list" class="list-item" :key="item.content_id">
           <div class="item">
-            <img src="http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/114/h/114" alt="">
-            <span>皮蛋瘦肉粥</span>
+            <div class="play">
+              <div class="fontFamily play-icon">&#xe671; {{item.access_num | getNum}}</div>
+            </div>
+            <img :src="item.cover_url_small" alt="">
+            <p>{{item.title}}</p>
           </div>
         </li>
       </ul>
@@ -25,9 +28,22 @@
 export default {
   props: {
     list: {
-      type: Array,
+      type: Object,
       default: function () {
-        return []
+        return {}
+      }
+    }
+  },
+  filters: {
+    getNum (value) {
+      if (String(value).length >= 5) {
+        if (String(value).length <= 8) {
+          return String(value).slice(0, -4) + '万'
+        } else {
+          return String(value).slice(0, -8) + '亿'
+        }
+      } else {
+        return value
       }
     }
   },
@@ -35,6 +51,9 @@ export default {
     return {
 
     }
+  },
+  created () {
+    console.log(this.list)
   }
 }
 </script>
@@ -43,6 +62,7 @@ export default {
 @import '~/style/variables.scss';
   .horizontal-scroll-list-wrap /deep/ .cube-scroll-content{
     display: inline-block;
+    white-space: wrap;
   }
   .title{
     height: rem(40);
@@ -61,22 +81,45 @@ export default {
   .horizontal-scroll-list-wrap{
     .list-wrapper{
       padding: 0 rem(16);
-      // line-height: rem(60);
       white-space: nowrap;
       .list-item{
-        display: inline-block;
+         // inline-block 无法对齐
+        display: inline-flex;
         .item{
           width: rem(106);
-          height: rem(136);
+          height: rem(146);
           margin-right: rem(10);
+          position: relative;
+          .play{
+            position: absolute;
+            right: 0;
+            top: rem(86);
+            height: rem(20);
+            line-height: rem(20);
+            background-color: rgb(0, 0, 0);
+            opacity: 0.6;
+            border-radius: rem(10);
+            padding: 0 rem(6);
+            color: #fff;
+            .play-icon{
+              font-size: rem(10);
+            }
+          }
           img{
             width: 100%;
             display: block;
             border-radius: rem(8);
           }
-          span{
-            text-align: center;
-            line-height: rem(30);
+          p{
+            height: rem(40);
+            margin-top: rem(8);
+            white-space: normal;
+            line-height: rem(16);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
         }
       }
