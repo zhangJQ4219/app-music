@@ -28,6 +28,11 @@ export default new Router({
       path: '/singer',
       name: 'singer',
       component: () => import('../views/singer/Singer.vue')
+    },
+    {
+      path: '/player',
+      name: 'player',
+      component: () => import('../views/player/Player.vue')
     }
   ]
 })

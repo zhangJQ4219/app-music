@@ -2,7 +2,7 @@
   <div class="m-header">
     <div class="title">
       <span class="text">音乐馆</span>
-      <div class="search">
+      <div class="search" @click="toSearch">
         <div class="fontFamily search-icon">&#xe600; 搜索</div>
       </div>
       <div class="fontFamily info">&#xe601;</div>
@@ -26,6 +26,11 @@
 
 <script>
 export default {
+  methods: {
+    toSearch () {
+      this.$emit('handleClick')
+    }
+  }
 }
 </script>
 

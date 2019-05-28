@@ -1,7 +1,7 @@
 <template>
   <div class="recommend" ref="wrapper">
     <div>
-      <m-header></m-header>
+      <m-header @handleClick="toSearch"></m-header>
       <div class="slide">
         <cube-slide :data="items" :autoPlay="false">
           <template slot="dots" slot-scope="props">
@@ -35,7 +35,7 @@ import MHeader from '../../components/m-header'
 import RecommendItem from './components/recommend-item'
 import BScroll from 'better-scroll'
 
-import { getTest, getRecommend, getSlider } from 'api/music.js'
+import { getRecommend, getSlider } from 'api/music.js'
 
 export default {
   data () {
@@ -80,6 +80,11 @@ export default {
   mounted () {
     this.scroll = new BScroll(this.$refs.wrapper, { click: true })
     // 获取轮播图
+  },
+  methods: {
+    toSearch () {
+      this.$router.push('/search')
+    }
   }
 }
 </script>
@@ -124,7 +129,7 @@ export default {
         padding-bottom: rem(10);
         cursor: pointer;
         .tab-icon{
-          color: #31c27c;
+          color: $app-color;
           font-size: rem(28);
           margin: rem(10) 0;
         }

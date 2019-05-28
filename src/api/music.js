@@ -26,3 +26,10 @@ export function getRankList () {
     method: 'get'
   })
 }
+
+export function search (params) {
+  return request({
+    url: `https://music.niubishanshan.top/api/v2/music/search/${params}`,
+    method: 'get'
+  })
+}

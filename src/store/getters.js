@@ -1,4 +1,4 @@
 const getters = {
-  name: state => state.user.name
+  playing: state => state.music.playing
 }
 export default getters

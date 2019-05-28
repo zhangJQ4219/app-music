@@ -1,11 +1,20 @@
 <template>
   <div class="search-header">
     <div class="title">
-      <div class="fontFamily left">&#xe606;</div>
+      <div class="fontFamily left" @click="backRec">&#xe606;</div>
       <div class="right" ref="search">
         <div class="fontFamily search-icon">&#xe600;</div>
-        <input v-model="keywords" @keydown="search($event)" class="search-input" type="search" ref="input" placeholder="搜索音乐、视频、歌单、歌手">
-        <div class="fontFamily search-icon">&#xe638;</div>
+        <input v-model="keywords" @input="inputing" @keydown="search($event)" class="search-input" type="search" ref="input" placeholder="搜索音乐、视频、歌单、歌手">
+        <div class="fontFamily search-icon" @click="handleClear" v-html="del"></div>
+      </div>
+    </div>
+    <div class="search-list" v-show="show">
+      <span class="search-word">搜索“{{keywords}}”</span>
+      <div class="search-item" v-for="item in getSixList" :key="item.songId">
+        <div class="fontFamily search-item-icon">&#xe600;</div>
+        <span v-html="item.list"></span>
+        <!-- <span class="search-result">{{item.songName}} -
+        <span class="search-result-other">{{item.singer[0].singerName}}</span></span> -->
       </div>
     </div>
     <div class="search-content">
@@ -27,7 +36,7 @@
     <div class="search-content" v-if="showHistory">
       <div class="search-content-title">
         <h1>搜索历史</h1>
-        <div class="fontFamily history-icon">&#xe600;</div>
+        <div class="fontFamily history-icon">&#xe61b;</div>
       </div>
       <div class="label">
         <div class="label-item" v-for="i in historyKeyList" :key="i">{{i}}</div>
@@ -37,9 +46,12 @@
 </template>
 
 <script>
+import { search } from 'api/music.js'
 export default {
   data () {
     return {
+      resultList: [],
+      show: false,
       history: [],
       keywords: '',
       historyKeyList: JSON.parse(localStorage.getItem('key')) || []
@@ -52,6 +64,29 @@ export default {
       } else {
         return false
       }
+    },
+    del () {
+      return this.keywords.length > 0 ? '&#xe668;' : '&#xe638;'
+    },
+    showSearch () {
+      console.log(this.resultList.length > 0)
+      return this.resultList.length > 0
+    },
+    getSixList () {
+      if (this.resultList.length > 0) {
+        if (this.resultList.length > 6) {
+          return this.resultList.slice(0, 6)
+        } else {
+          return this.resultList
+        }
+      } else {
+        return []
+      }
+    }
+  },
+  watch: {
+    keywords (value) {
+      this.show = value.trim() !== ''
     }
   },
   mounted () {
@@ -65,6 +100,37 @@ export default {
         this.historyKeyList.push(this.keywords)
         localStorage.setItem('key', JSON.stringify(this.historyKeyList))
       }
+    },
+    inputing (e) {
+      this.keywords = e.target.value
+      if (this.keywords.trim().length > 0) {
+        search(this.keywords).then(res => {
+          let data = res.data.songList
+          data.forEach((item, index) => {
+            let result = `${item.songName} - ${item.singer[0].singerName}`
+            item.list = this.highLight(result)
+          })
+          this.resultList = data
+        })
+      }
+    },
+    backRec () {
+      this.$router.push('/recommend')
+    },
+    handleClear () {
+      if (this.keywords.length > 0) {
+        this.keywords = ''
+      }
+    },
+    // 高亮显示关键字
+    highLight (result) {
+      let lastStr = ''
+      if (this.keywords && this.keywords.length > 0) {
+        let reg = new RegExp(this.keywords, 'g')
+        let str = `<span class="search-result">${this.keywords}</span>`
+        lastStr = result.replace(reg, str)
+      }
+      return lastStr
     }
   }
 }
@@ -110,6 +176,34 @@ export default {
           line-height: rem(30);
           text-align: center;
           color: $text-color1;
+        }
+      }
+    }
+    .search-list{
+      z-index: 2;
+      position: absolute;
+      top: rem(48);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      background-color: $bg;
+      display: flex;
+      flex-direction: column;
+      margin: rem(16);
+      font-size: rem(16);
+      .search-word{
+        line-height: 1.2;
+      }
+      .search-item{
+        @include ellipsis();
+        margin: rem(16) 0;
+        .search-item-icon{
+          display: inline-block;
+          margin-right: rem(16);
+        }
+        & /deep/ .search-result{
+          color: $app-color;
         }
       }
     }

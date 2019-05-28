@@ -2,7 +2,7 @@
   <div>
     <div class="title">
       <span>{{list.title}}</span>
-      <div class="fontFamily tab-icon">更多 &#xe671;</div>
+      <div class="fontFamily tab-icon">更多 &#xe631;</div>
     </div>
     <cube-scroll
       ref="scroll"
@@ -13,7 +13,7 @@
         <li v-for="item in list.list" class="list-item" :key="item.content_id">
           <div class="item">
             <div class="play">
-              <div class="fontFamily play-icon">&#xe671; {{item.access_num | getNum}}</div>
+              <div class="fontFamily play-icon">&#xe68e; {{item.access_num | getNum}}</div>
             </div>
             <img :src="item.cover_url_small" alt="">
             <p>{{item.title}}</p>

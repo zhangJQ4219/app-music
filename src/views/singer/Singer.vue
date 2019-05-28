@@ -1,7 +1,7 @@
 <template>
   <div class="singer">
     <div class="title">
-      <div class="fontFamily icon">&#xe606;</div>
+      <div class="fontFamily icon" @click="backRec">&#xe606;</div>
       <span>歌手</span>
       <div class="fontFamily icon">&#xe638;</div>
     </div>
@@ -67,6 +67,9 @@ export default {
   methods: {
     selectItem () {
 
+    },
+    backRec () {
+      this.$router.push('/recommend')
     }
   }
 }
