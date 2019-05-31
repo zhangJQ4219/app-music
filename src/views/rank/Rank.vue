@@ -5,7 +5,7 @@
       <div class="title-name">音乐排行榜</div>
     </div>
     <div class="rank-list">
-      <div class="rank-item" v-for="item in rankList" :key="item.id">
+      <div class="rank-item" @click="toMusicList(item)" v-for="item in rankList" :key="item.id">
         <div class="sings">
           <span class="sing-title">{{item.topTitle}}</span>
           <ul class="sing-list">
@@ -19,11 +19,13 @@
         <div class="img">图片</div>
       </div>
     </div>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 import { getRankList } from 'api/music.js'
+import { mapGetters } from 'vuex'
 export default {
   data () {
     return {
@@ -31,15 +33,24 @@ export default {
     }
   },
   created () {
+    // 获取排行榜数据
     getRankList().then(res => {
       let data = JSON.parse(res.body).data
       this.rankList = data.topList
-      console.log(this.rankList)
     })
+  },
+  computed: {
+    ...mapGetters(['playList'])
   },
   methods: {
     backRec () {
       this.$router.push('/recommend')
+    },
+    toMusicList (item) {
+      this.$store.dispatch('SET_MUSIC_LIST', item)
+        .then(() => {
+          this.$router.push({ name: 'musicList', params: { id: item.id } })
+        })
     }
   }
 }

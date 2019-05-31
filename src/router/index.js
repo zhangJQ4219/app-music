@@ -22,7 +22,12 @@ export default new Router({
     {
       path: '/rank',
       name: 'rank',
-      component: () => import('../views/rank/Rank.vue')
+      component: () => import('../views/rank/Rank.vue'),
+      children: [{
+        path: ':id',
+        name: 'musicList',
+        component: () => import('../views/musicList/MusicList.vue')
+      }]
     },
     {
       path: '/singer',

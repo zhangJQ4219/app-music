@@ -86,11 +86,11 @@ export default {
       position: relative;
       top: 13px;
       height: 4px;
-      background: rgba(0, 0, 0, 0.3);
+      background: #ccc;
       .progress{
         position: absolute;
         height: 100%;
-        background: $bg;
+        background: $app-color;
       }
       .progress-btn-wrapper{
         position: absolute;
@@ -105,7 +105,7 @@ export default {
           box-sizing: border-box;
           width: 16px;
           height: 16px;
-          border: 3px solid $app-color;
+          // border: 3px solid $app-color;
           border-radius: 50%;
           background: $bg;
         }

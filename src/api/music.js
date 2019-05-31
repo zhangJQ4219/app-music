@@ -8,21 +8,21 @@ export function getTest () {
 
 export function getSlider () {
   return request({
-    url: '/api/getSlider',
+    url: '/getSlider',
     method: 'get'
   })
 }
 
 export function getRecommend () {
   return request({
-    url: '/api/getRecommend',
+    url: '/getRecommend',
     method: 'get'
   })
 }
 
 export function getRankList () {
   return request({
-    url: '/api/getRankList',
+    url: '/getRankList',
     method: 'get'
   })
 }
@@ -30,6 +30,13 @@ export function getRankList () {
 export function search (params) {
   return request({
     url: `https://music.niubishanshan.top/api/v2/music/search/${params}`,
+    method: 'get'
+  })
+}
+
+export function getMusicList () {
+  return request({
+    url: 'https://www.easy-mock.com/mock/5cb429769e5e43437f720ad8/example/getMusicList',
     method: 'get'
   })
 }

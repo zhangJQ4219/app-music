@@ -1,10 +1,15 @@
 <template>
   <div id="app">
     <router-view/>
+    <player></player>
   </div>
 </template>
 <script>
+import Player from './views/player/Player'
 export default {
+  components: {
+    Player
+  },
   mounted () {
     window.onload = function () {
       // 获取屏幕宽度
