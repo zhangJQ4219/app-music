@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { getSearch, getRankListDetails, getSongUrl } from 'api/music'
 export default {
   data () {
     return {
@@ -63,6 +64,12 @@ export default {
     }
   },
   created () {
+    let key = {
+      'id': 26,
+      'time': '2019-05-30'
+    }
+    getRankListDetails(key).then(res => {
+    })
   },
   methods: {
     selectItem () {

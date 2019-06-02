@@ -2,13 +2,13 @@
   <div v-show="showPlayer" @touchmove.prevent>
     <div class="player" v-show="fullScreen">
       <div class="bg">
-        <img width="100%" height="100%" :src="currentSong.img">
+        <img width="100%" height="100%" :src="currentSong.imgUrlBig">
       </div>
       <div class="content">
         <div class="top">
           <div class="fontFamily top-left" @click="handleMini">&#xe60e;</div>
-          <span class="song-name">{{currentSong.songName}}</span>
-          <span class="singer-name">{{currentSong.singerName}}</span>
+          <span class="song-name">{{currentSong.name }}</span>
+          <span class="singer-name">{{currentSong.singer && currentSong.singer[0].name}}</span>
         </div>
         <div class="middle"
           @touchstart.prevent="middleTouchStart"
@@ -16,13 +16,13 @@
           @touchend="middleTouchEnd">
           <div class="middle-left" ref="middleL">
             <div class="pic" :class="play">
-              <img :src="currentSong.img" alt="">
+              <img width="100%" height="100%" :src="currentSong.imgUrlBig" alt="">
             </div>
           </div>
           <m-scroll class="middle-right" ref="lyricList" :data="currentLyric && currentLyric.lines">
             <div class="lyric-wraaper">
               <div v-if="currentLyric">
-                <p class="text" ref="lyricLine" :class="{'current': currentLine === index}" v-for="(item, index) in currentLyric.lines" :key="item.time">{{item.txt}}</p>
+                <p class="text" ref="lyricLine" :class="{'current': currentLine === index}" v-for="(item, index) in currentLyric.lines" :key="index">{{item.txt}}</p>
               </div>
             </div>
           </m-scroll>
@@ -51,7 +51,7 @@
     </div>
     <div class="player-mini" v-show="!fullScreen" @click="handleOpen">
       <div class="left" :class="play">
-        <img class="pic-mini" :src="currentSong.img" alt="">
+        <img class="pic-mini" :src="currentSong.imgUrlSmall" alt="">
       </div>
       <div class="middle">
         <span class="middle-name-mini">{{currentSong.songName}} - {{currentSong.singerName}}</span>
@@ -61,11 +61,12 @@
         <div class="fontFamily btn-list">&#xe717;</div>
       </div>
     </div>
-      <audio ref="audio" :src="currentSong.url" @canplay="ready" @ended="end"  @timeupdate="updateTime"></audio>
+      <audio ref="audio" :src="currentSongUrl" @canplay="ready" @ended="end"  @timeupdate="updateTime"></audio>
   </div>
 </template>
 
 <script>
+import { getSongUrl, getLyric } from 'api/music'
 import MProgress from './components/m-progress'
 import { mapGetters } from 'vuex'
 import { Base64 } from 'js-base64'
@@ -85,7 +86,9 @@ export default {
       songReady: false,
       currentLyric: null,
       currentLine: 0,
-      currentShow: 'cd'
+      currentShow: 'cd',
+      currentSongUrl: null,
+      currentSongLyric: null // 未解析
     }
   },
   created () {
@@ -93,13 +96,15 @@ export default {
   },
   watch: {
     currentSong (newSong, oldSong) {
-      console.log('1')
+      console.log('SSSSS')
       if (!newSong.id) {
         return
       }
       if (newSong.id === oldSong.id) {
         return
       }
+      this._getSongUrl()
+      this._getSongLyric()
       if (this.currentLyric) {
         this.currentLyric.stop()
         this.currentTime = 0
@@ -109,11 +114,10 @@ export default {
       this.timer = setTimeout(() => {
         this.$store.commit('SET_PLAYING', true)
         this.$refs.audio.play()
-        this.getLyric()
+        this.getAnalysisedLyric()
       }, 100)
     },
     playing (newPlaying) {
-      console.log('12')
       this.$nextTick(() => {
         let audio = this.$refs.audio
         newPlaying ? audio.play() : audio.pause()
@@ -139,7 +143,7 @@ export default {
     },
     // 显示播放器
     showPlayer () {
-      return this.playList.length > 0 && this.currentSong.url
+      return this.playList.length > 0 && this.currentSongUrl
     },
     percent () {
       return this.currentTime / this.duration
@@ -203,7 +207,6 @@ export default {
     changeMode () {
       let mode = (this.mode + 1) % 3
       this.$store.commit('SET_MODE', mode)
-      console.log(mode)
     },
     // 播放结束后根据播放模式播放下一首歌曲
     end () {
@@ -239,21 +242,37 @@ export default {
         this.currentLyric.seek(currentTime * 1000)
       }
     },
+    // 获取歌词url
+    _getSongUrl () {
+      let params = {
+        songmid: this.currentSong.mid
+      }
+      getSongUrl(params).then(res => {
+        this.currentSongUrl = `${res.data.sip[0]}${res.data.midurlinfo[0].purl}`
+      })
+    },
+    // 获取歌词内容
+    _getSongLyric () {
+      let params = {
+        songmid: this.currentSong.mid
+      }
+      getLyric(params).then(res => {
+        this.currentSongLyric = res.data.lyric
+      })
+    },
     // 解析歌词
-    getLyric () {
-      this.currentLyric = new Lyric(Base64.decode(this.currentSong.lyric), this.handleLyric)
+    getAnalysisedLyric () {
+      this.currentLyric = new Lyric(Base64.decode(this.currentSongLyric), this.handleLyric)
       if (this.playing) {
         this.currentLyric.play()
       } else {
         this.currentLyric.stop()
       }
-      console.log(this.currentLyric)
     },
     handleLyric ({ lineNum, txt }) {
       this.currentLine = lineNum
       if (lineNum > 5) {
         let lineEl = this.$refs.lyricLine[lineNum - 5]
-        console.log(lineEl)
         this.$refs.lyricList.scrollToElement(lineEl, 500)
       } else {
         this.$refs.lyricList.scrollTo(0, 0, 500)
@@ -334,8 +353,8 @@ export default {
     width: 100%;
     height: 100%;
     z-index: -1;
-    opacity: .2;
-    filter: blur(20px);
+    opacity: .3;
+    filter: blur(30px);
   }
   .content{
     height: 100vh;

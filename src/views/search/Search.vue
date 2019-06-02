@@ -10,7 +10,7 @@
     </div>
     <div class="search-list" v-show="show">
       <span class="search-word">搜索“{{keywords}}”</span>
-      <div class="search-item" v-for="item in getSixList" :key="item.songId">
+      <div class="search-item" @click="playSong(item)" v-for="item in getSixList" :key="item.songId">
         <div class="fontFamily search-item-icon">&#xe600;</div>
         <span v-html="item.list"></span>
         <!-- <span class="search-result">{{item.songName}} -
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { search } from 'api/music.js'
+import { getSearch } from 'api/music.js'
 export default {
   data () {
     return {
@@ -69,7 +69,6 @@ export default {
       return this.keywords.length > 0 ? '&#xe668;' : '&#xe638;'
     },
     showSearch () {
-      console.log(this.resultList.length > 0)
       return this.resultList.length > 0
     },
     getSixList () {
@@ -103,16 +102,24 @@ export default {
     },
     inputing (e) {
       this.keywords = e.target.value
+      let params = {
+        key: this.keywords
+      }
       if (this.keywords.trim().length > 0) {
-        search(this.keywords).then(res => {
-          let data = res.data.songList
+        getSearch(params).then(res => {
+          let data = res.data.song.itemlist
           data.forEach((item, index) => {
-            let result = `${item.songName} - ${item.singer[0].singerName}`
+            let result = `${item.name} - ${item.singer}`
             item.list = this.highLight(result)
           })
           this.resultList = data
         })
       }
+    },
+    playSong (item) {
+      this.$store.dispatch('SET_PLAY_LIST', this.resultList)
+      this.$store.commit('SET_CURRENT_INDEX', 0)
+      this.$store.commit('SET_FULL_SCREEN', true)
     },
     backRec () {
       this.$router.push('/recommend')

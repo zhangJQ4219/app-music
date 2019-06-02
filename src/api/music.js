@@ -19,24 +19,58 @@ export function getRecommend () {
     method: 'get'
   })
 }
-
+// 获取榜单前三数据
 export function getRankList () {
   return request({
-    url: '/getRankList',
+    url: '/getTopList',
     method: 'get'
   })
 }
 
-export function search (params) {
+//
+export function getRankListDetails (params) {
   return request({
-    url: `https://music.niubishanshan.top/api/v2/music/search/${params}`,
-    method: 'get'
+    url: '/getTopListDetails',
+    method: 'get',
+    params
   })
 }
+
+// export function search (params) {
+//   return request({
+//     url: `https://music.niubishanshan.top/api/v2/music/search/${params}`,
+//     method: 'get'
+//   })
+// }
 
 export function getMusicList () {
   return request({
     url: 'https://www.easy-mock.com/mock/5cb429769e5e43437f720ad8/example/getMusicList',
     method: 'get'
+  })
+}
+
+// 获取搜索信息
+export function getSearch (params) {
+  return request({
+    url: '/getSearch',
+    method: 'get',
+    params
+  })
+}
+// 获取歌词
+export function getLyric (params) {
+  return request({
+    url: '/getLyric',
+    method: 'get',
+    params
+  })
+}
+// 获取歌曲url
+export function getSongUrl (params) {
+  return request({
+    url: '/getSongUrl',
+    method: 'get',
+    params
   })
 }

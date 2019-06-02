@@ -16,7 +16,9 @@
             </li>
           </ul>
         </div>
-        <div class="img">图片</div>
+        <div class="img">
+          <img :src="item.picUrl" alt="">
+        </div>
       </div>
     </div>
     <router-view></router-view>
@@ -35,8 +37,7 @@ export default {
   created () {
     // 获取排行榜数据
     getRankList().then(res => {
-      let data = JSON.parse(res.body).data
-      this.rankList = data.topList
+      this.rankList = res.data.topList
     })
   },
   computed: {
@@ -131,6 +132,9 @@ export default {
         width: rem(106);
         height: rem(106);
         background-color: #333;
+        img{
+          width: 100%;
+        }
       }
     }
   }
