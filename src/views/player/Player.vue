@@ -96,7 +96,6 @@ export default {
   },
   watch: {
     currentSong (newSong, oldSong) {
-      console.log('SSSSS')
       if (!newSong.id) {
         return
       }

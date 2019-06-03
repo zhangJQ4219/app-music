@@ -1,22 +1,44 @@
 <template>
   <div class="music-list" @touchmove.prevent>
-    <div v-for="(item, index) in topListDetails" :key="item.songName" @click="playMusic(index, item)" class="music">{{item.title}} - {{item.singer[0].name}}</div>
+    <div class="fontFamily back-icon" @click="back">&#xe606;</div>
+    <div class="title">{{title}}</div>
+    <div class="bg-img" :style="bgImg" ref="bgImg">
+    </div>
+    <div class="bg-layer" ref="layer"></div>
+    <m-scroll :data="topListDetails" @scroll="scroll"
+            :listen-scroll="listenScroll" :probe-type="probeType" class="list" ref="list">
+      <div class="list-wrapper">
+        <!-- <div class="play-all">
+          <div class="fontFamily back-icon" >&#xe60c;</div>
+        </div> -->
+        <div v-for="(item, index) in topListDetails" :key="item.songName" @click="playMusic(index, item)" class="music">
+          <p class="song-name">{{index + 1}} {{item.title}}</p>
+          <p class="song-singer">{{item.singer[0].name}}·{{item.title}}</p>
+        </div>
+      </div>
+    </m-scroll>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import { getRankListDetails } from 'api/music.js'
-// import { Base64 } from 'js-base64'
-// import Lyric from 'lyric-parser'
-
+import MScroll from '@/components/m-scroll'
 export default {
+  components: {
+    MScroll
+  },
   data () {
     return {
-      topListDetails: []
+      topListDetails: [],
+      title: '',
+      scrollY: 0,
+      imgHeight: 0
     }
   },
   created () {
+    this.probeType = 3
+    this.listenScroll = true
     // 刷新返回 上级目录
     if (!this.musicList.id) {
       this.$router.push('/rank')
@@ -25,24 +47,58 @@ export default {
       this.getList(this.$route.params.id)
     }
   },
+  mounted () {
+    this.imgHeight = this.$refs.bgImg.clientHeight
+    this.$refs.list.$el.style.top = `${this.imgHeight}px`
+  },
   computed: {
-    ...mapGetters(['musicList', 'playList'])
+    bgImg () {
+      // return `background-image:url(${this.bgImage})`
+      return `background-image:url("https://y.gtimg.cn/music/photo_new/T002R300x300M000003c616O2Zlswm.jpg?max_age=2592000")`
+    },
+    ...mapGetters(['musicList'])
   },
   watch: {
-    musicList () {
-    },
-    playList () {
+    scrollY (newY) {
+      let moveHight = -this.imgHeight + 46 // 最高移动距离 46是顶部导航高度
+      let translateY = Math.max(moveHight, newY)
+      let zIndex = 0
+      let scale = 1
+      let percent = Math.abs(newY / this.imgHeight)
+      if (newY > 0) {
+        scale = 1 + percent
+        zIndex = 10
+      }
+      this.$refs.bgImg.style['transform'] = `scale(${scale})`
+      this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`
+      if (newY < moveHight) {
+        zIndex = 10
+        this.$refs.bgImg.style.paddingTop = 0
+        this.$refs.bgImg.style.height = '46px'
+      } else {
+        this.$refs.bgImg.style.paddingTop = '70%'
+        this.$refs.bgImg.style.height = 0
+      }
+      this.$refs.bgImg.style.zIndex = zIndex
     }
   },
   methods: {
+    back () {
+      console.log('s')
+      this.$router.push('/rank')
+    },
+    scroll (pos) {
+      this.scrollY = pos.y
+    },
     // 获取播放列表并存入store
     getList (id) {
       let params = {
         id,
-        day: '2019-06-02',
-        week: '2019_21'
+        day: '2019-06-03',
+        week: '2019_22'
       }
       getRankListDetails(params).then(res => {
+        this.title = res.data.data.title
         let list = res.data.songInfoList
         list.forEach(item => {
           item.imgUrlBig = `https://y.gtimg.cn/music/photo_new/T002R800x800M000${item.album.mid}.jpg?max_age=2592000`
@@ -54,20 +110,10 @@ export default {
     },
     // 播放音乐并将信息存入store
     playMusic (index, item) {
-      console.log(index)
-      // document.body.classList.add('overflow-hidden')
-      // document.addEventListener('touchmove', this.touchStart, { passive: false })
       this.$store.commit('SET_PLAY_LIST', this.topListDetails)
       this.$store.commit('SET_CURRENT_INDEX', index)
       this.$store.commit('SET_FULL_SCREEN', true)
-      // this.$store.commit('SET_CURRENT_LYRIC', item.lyric)
     }
-    // // 解析歌词
-    // getLyric (val) {
-    //   let lyric = new Lyric(Base64.decode(val))
-    //   console.log(new Lyric(Base64.decode(val)))
-    //   this.$store.commit('SET_CURRENT_LYRIC', lyric)
-    // }
   }
 }
 </script>
@@ -81,9 +127,58 @@ export default {
     left: 0;
     width: 100%;
     height:100%;
-    background-color: #999;
-    .music{
-      padding: rem(16);
+    // background-color: #999;
+    .back-icon{
+      position: absolute;
+      left: 0;
+      top: 0;
+      padding: rem(8);
+      font-size: rem(30);
+      z-index: 50;
+      color: #fff;
+    }
+    .title{
+      pointer-events: none; // 点击穿透
+      position: absolute;
+      @include ellipsis();
+      height: rem(46);
+      line-height: rem(46);
+      width: 100%;
+      font-size: rem(24);
+      text-align: center;
+      color: #fff;
+      z-index: 50;
+    }
+    .bg-img{
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-top: 70%;
+      transform-origin: top;
+      background-size: cover;
+    }
+    .bg-layer{
+      position: relative;
+      height: 100%;
+      background-color: #fff;
+    }
+    .list{
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      .music{
+        padding:rem(8) rem(16);
+        .song-name{
+          font-size: rem(16);
+          height: rem(24);
+          line-height: rem(24);
+          color: #000;
+        }
+        .song-singer{
+          color: #666;
+        }
+      }
     }
   }
 </style>

@@ -107,6 +107,7 @@ export default {
       }
       if (this.keywords.trim().length > 0) {
         getSearch(params).then(res => {
+          console.log(res)
           let data = res.data.song.itemlist
           data.forEach((item, index) => {
             let result = `${item.name} - ${item.singer}`

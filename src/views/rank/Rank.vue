@@ -37,7 +37,8 @@ export default {
   created () {
     // 获取排行榜数据
     getRankList().then(res => {
-      this.rankList = res.data.topList
+      // this.rankList = res.data.topList
+      this.rankList = res.data.topList.slice(0, 1)
     })
   },
   computed: {
