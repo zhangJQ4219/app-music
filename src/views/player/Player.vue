@@ -107,13 +107,12 @@ export default {
         this.currentLine = 0
         this.$refs.audio.currentTime = 0
       }
-      // if (this.songReady) {
+      this._getSongLyric()
+      console.log(this.currentSongUrl)
       setTimeout(() => {
-        this._getSongLyric()
         // this.$store.commit('SET_PLAYING', true)
         this.$refs.audio.play()
-      }, 1000)
-      // }
+      }, 500)
     },
     playing (newPlaying) {
       this.$nextTick(() => {
@@ -289,6 +288,12 @@ export default {
       getLyric(params).then(res => {
         this._getSongUrl()
         this.currentLyric = new Lyric(Base64.decode(res.data.lyric), this.handleLyric)
+        if (this.currentLyric.lines.length === 0) {
+          this.currentLyric.lines = [{
+            'time': 0,
+            'txt': '此歌曲为没有填词的纯音乐，请您欣赏'
+          }]
+        }
         if (this.playing) {
           this.currentLyric.play()
         }
