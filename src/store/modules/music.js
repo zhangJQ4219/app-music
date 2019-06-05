@@ -33,7 +33,7 @@ const music = {
       state.mode = value
     },
     SET_RANK_DETAILS (state, list) {
-      state.mode = list
+      state.rankListDetails = list
     }
   },
   actions: {

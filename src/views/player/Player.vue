@@ -41,9 +41,9 @@
           </div>
           <div class="btn-wrapper">
             <div class="fontFamily btn-small" @click="changeMode" v-html="modeIcon"></div>
-            <div class="fontFamily btn-middle" @click="prev">&#xe607;</div>
-            <div class="fontFamily btn-big" @click="playSong" v-html="playIcon"></div>
-            <div class="fontFamily btn-middle" @click="next">&#xe62c;</div>
+            <div class="fontFamily btn-middle" @click="prev" :class="disableCls">&#xe607;</div>
+            <div class="fontFamily btn-big" @click="playSong" :class="disableCls" v-html="playIcon"></div>
+            <div class="fontFamily btn-middle" @click="next" :class="disableCls">&#xe62c;</div>
             <div class="fontFamily btn-small" >&#xe717;</div>
           </div>
         </div>
@@ -54,14 +54,14 @@
         <img class="pic-mini" :src="currentSong.imgUrlSmall" alt="">
       </div>
       <div class="middle">
-        <span class="middle-name-mini">{{currentSong.songName}} - {{currentSong.singerName}}</span>
+        <span class="middle-name-mini">{{currentSong.name}} - {{currentSong.singer && currentSong.singer[0].name}}</span>
       </div>
       <div class="right">
         <div class="fontFamily btn-play" @click.stop="playSong" v-html="playIcon"></div>
         <div class="fontFamily btn-list">&#xe717;</div>
       </div>
     </div>
-      <audio ref="audio" :src="currentSongUrl" @canplay="ready" @ended="end"  @timeupdate="updateTime"></audio>
+      <audio ref="audio" muted :src="currentSongUrl" @canplay="ready" @error="error" @ended="end"  @timeupdate="updateTime"></audio>
   </div>
 </template>
 
@@ -87,8 +87,7 @@ export default {
       currentLyric: null,
       currentLine: 0,
       currentShow: 'cd',
-      currentSongUrl: null,
-      currentSongLyric: null // 未解析
+      currentSongUrl: null
     }
   },
   created () {
@@ -102,19 +101,19 @@ export default {
       if (newSong.id === oldSong.id) {
         return
       }
-      this._getSongUrl()
-      this._getSongLyric()
       if (this.currentLyric) {
         this.currentLyric.stop()
         this.currentTime = 0
         this.currentLine = 0
+        this.$refs.audio.currentTime = 0
       }
-      clearTimeout(this.timer)
-      this.timer = setTimeout(() => {
-        this.$store.commit('SET_PLAYING', true)
+      // if (this.songReady) {
+      setTimeout(() => {
+        this._getSongLyric()
+        // this.$store.commit('SET_PLAYING', true)
         this.$refs.audio.play()
-        this.getAnalysisedLyric()
-      }, 100)
+      }, 1000)
+      // }
     },
     playing (newPlaying) {
       this.$nextTick(() => {
@@ -146,6 +145,9 @@ export default {
     },
     percent () {
       return this.currentTime / this.duration
+    },
+    disableCls () {
+      return this.songReady ? '' : 'disable'
     },
     ...mapGetters(['playing', 'fullScreen', 'currentIndex', 'playList', 'currentSong', 'mode'])
   },
@@ -185,22 +187,40 @@ export default {
       if (!this.songReady) {
         return
       }
-      let index = this.currentIndex + 1
-      if (index === this.playList.length) {
-        index = 0
+      if (this.playList.length === 1) {
+        this.loop()
+        return
+      } else {
+        let index = this.currentIndex + 1
+        if (index === this.playList.length) {
+          index = 0
+        }
+        this.$store.commit('SET_CURRENT_INDEX', index)
+        if (!this.playing) {
+          this.playSong()
+        }
       }
-      this.$store.commit('SET_CURRENT_INDEX', index)
+      this.songReady = false
     },
     // 上一首
     prev () {
       if (!this.songReady) {
         return
       }
-      let index = this.currentIndex - 1
-      if (index === -1) {
-        index = this.playList.length - 1
+      if (this.playList.length === 1) {
+        this.loop()
+        return
+      } else {
+        let index = this.currentIndex - 1
+        if (index === -1) {
+          index = this.playList.length - 1
+        }
+        this.$store.commit('SET_CURRENT_INDEX', index)
+        if (!this.playing) {
+          this.playSong()
+        }
       }
-      this.$store.commit('SET_CURRENT_INDEX', index)
+      this.songReady = false
     },
     // 改变模式
     changeMode () {
@@ -214,19 +234,27 @@ export default {
           this.next()
           break
         case 1: // 单曲循环
-          this.$refs.audio.play()
-          if (this.currentLyric) {
-            this.currentLyric.seek(0)
-          }
+          this.loop()
           break
         default: // 随机循环
           let random = Math.floor(Math.random() * this.playList.length)
           this.$store.commit('SET_CURRENT_INDEX', random)
           if (random === this.currentIndex) {
+            this.$refs.audio.currentTime = 0
+            this.currentTime = 0
+            this.currentLine = 0
+            this.currentLyric.seek(0)
             this.$refs.audio.play()
           }
           break
       }
+    },
+    loop () {
+      this.$refs.audio.currentTime = 0
+      this.currentTime = 0
+      this.currentLine = 0
+      this.currentLyric.seek(0)
+      this.$refs.audio.play()
     },
     updateTime (e) {
       this.currentTime = e.target.currentTime
@@ -240,6 +268,9 @@ export default {
       if (this.currentLyric) {
         this.currentLyric.seek(currentTime * 1000)
       }
+    },
+    error () {
+      this.songReady = true
     },
     // 获取歌词url
     _getSongUrl () {
@@ -256,18 +287,24 @@ export default {
         songmid: this.currentSong.mid
       }
       getLyric(params).then(res => {
-        this.currentSongLyric = res.data.lyric
+        this._getSongUrl()
+        this.currentLyric = new Lyric(Base64.decode(res.data.lyric), this.handleLyric)
+        if (this.playing) {
+          this.currentLyric.play()
+        }
+        // this.getAnalysisedLyric(res.data.lyric)
       })
     },
     // 解析歌词
-    getAnalysisedLyric () {
-      this.currentLyric = new Lyric(Base64.decode(this.currentSongLyric), this.handleLyric)
-      if (this.playing) {
-        this.currentLyric.play()
-      } else {
-        this.currentLyric.stop()
-      }
-    },
+    // getAnalysisedLyric (newLyric) {
+    //   this.currentLyric = new Lyric(Base64.decode(newLyric), this.handleLyric)
+    //   if (this.playing) {
+    //     this.currentLyric.play()
+    //   }
+    //   // else {
+    //   //   this.currentLyric.stop()
+    //   // }
+    // },
     handleLyric ({ lineNum, txt }) {
       this.currentLine = lineNum
       if (lineNum > 5) {
@@ -470,9 +507,15 @@ export default {
         }
         .btn-middle{
           font-size: rem(40);
+          &.disable{
+            color: #666;
+          }
         }
         .btn-big{
           font-size: rem(50);
+          &.disable{
+            color: #666;
+          }
         }
       }
     }
@@ -510,7 +553,7 @@ export default {
     flex: 1;
     @include ellipsis();
     .middle-name-mini{
-      font-size: rem(16);
+      font-size: rem(12);
     }
   }
   .right{

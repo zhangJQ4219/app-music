@@ -10,11 +10,18 @@
     </div>
     <div class="search-list" v-show="show">
       <span class="search-word">搜索“{{keywords}}”</span>
-      <div class="search-item" @click="playSong(item)" v-for="item in getSixList" :key="item.songId">
+      <div class="title-singer" v-if="singerItemList.length">歌手</div>
+      <div class="search-item" @click="playSong(item)" v-for="item in singerItemList" :key="item.id">
         <div class="fontFamily search-item-icon">&#xe600;</div>
-        <span v-html="item.list"></span>
-        <!-- <span class="search-result">{{item.songName}} -
-        <span class="search-result-other">{{item.singer[0].singerName}}</span></span> -->
+        <span v-html="item.text"></span>
+      </div>
+      <div class="title-song" v-if="songItemList.length">歌曲</div>
+      <div class="search-item" @click="playSong(item)" v-for="item in songItemList" :key="item.id">
+        <div class="fontFamily search-item-icon">&#xe600;</div>
+        <span v-html="item.text"></span>
+      </div>
+      <div class="loading-container" v-show="loading">
+        <m-loading></m-loading>
       </div>
     </div>
     <div class="search-content">
@@ -22,21 +29,14 @@
         <h1>热门搜索</h1>
       </div>
       <div class="label">
-        <div class="label-item">黄老板新歌</div>
-        <div class="label-item">情深深雨蒙蒙</div>
-        <div class="label-item">不要错过爱</div>
-        <div class="label-item">魏新雨</div>
-        <div class="label-item">有一种悲伤</div>
-        <div class="label-item">got7</div>
-        <div class="label-item">hit fluffy</div>
-        <div class="label-item">作为怪物</div>
-        <div class="label-item">余情未了</div>
+        <div class="label-item" v-for="item in hotKeys" :key="item.n">{{item.k}}</div>
       </div>
     </div>
-    <div class="search-content" v-if="showHistory">
+    <div class="search-content" v-if="historyKeyList && historyKeyList.length">
       <div class="search-content-title">
         <h1>搜索历史</h1>
-        <div class="fontFamily history-icon">&#xe61b;</div>
+        <cube-button @click="clearHistory">Dialog - btn</cube-button>
+        <div class="fontFamily history-icon" @click="clearHistory">&#xe61b;</div>
       </div>
       <div class="label">
         <div class="label-item" v-for="i in historyKeyList" :key="i">{{i}}</div>
@@ -46,47 +46,44 @@
 </template>
 
 <script>
-import { getSearch } from 'api/music.js'
+import { getSearch, getHotKeys } from 'api/music.js'
+import MLoading from '@/components/m-loading'
 export default {
+  components: {
+    MLoading
+  },
   data () {
     return {
-      resultList: [],
+      songItemList: [],
+      singerItemList: [],
       show: false,
       history: [],
       keywords: '',
-      historyKeyList: JSON.parse(localStorage.getItem('key')) || []
+      hotKeys: [],
+      historyKeyList: JSON.parse(localStorage.getItem('hotKeys')) || [],
+      showHistory: true
     }
   },
   computed: {
-    showHistory () {
-      if (JSON.parse(localStorage.getItem('key'))) {
-        return JSON.parse(localStorage.getItem('key')).length > 0
-      } else {
-        return false
-      }
+    loading () {
+      return !(this.songItemList.length > 0 || this.singerItemList.length > 0)
     },
     del () {
       return this.keywords.length > 0 ? '&#xe668;' : '&#xe638;'
     },
     showSearch () {
-      return this.resultList.length > 0
-    },
-    getSixList () {
-      if (this.resultList.length > 0) {
-        if (this.resultList.length > 6) {
-          return this.resultList.slice(0, 6)
-        } else {
-          return this.resultList
-        }
-      } else {
-        return []
-      }
+      return this.songItemList.length > 0 || this.singerItemList.length > 0
     }
   },
   watch: {
     keywords (value) {
       this.show = value.trim() !== ''
     }
+  },
+  created () {
+    getHotKeys().then(res => {
+      this.hotKeys = res.data.hotkey.slice(0, 10)
+    })
   },
   mounted () {
     this.$refs.search.addEventListener('animationend', () => {
@@ -97,7 +94,7 @@ export default {
     search (e) {
       if (e.keyCode === 13) {
         this.historyKeyList.push(this.keywords)
-        localStorage.setItem('key', JSON.stringify(this.historyKeyList))
+        localStorage.setItem('hotKeys', JSON.stringify(this.historyKeyList))
       }
     },
     inputing (e) {
@@ -107,20 +104,32 @@ export default {
       }
       if (this.keywords.trim().length > 0) {
         getSearch(params).then(res => {
-          console.log(res)
-          let data = res.data.song.itemlist
-          data.forEach((item, index) => {
-            let result = `${item.name} - ${item.singer}`
-            item.list = this.highLight(result)
-          })
-          this.resultList = data
+          if (res.data.song.itemlist.length > 0) {
+            res.data.song.itemlist.forEach((item, index) => {
+              let reg = `${item.name} - ${item.singer}`
+              item.text = this._highLight(reg)
+            })
+            this.songItemList = res.data.song.itemlist
+          }
+          if (res.data.singer.itemlist.length > 0) {
+            res.data.singer.itemlist.forEach((item, index) => {
+              item.text = this._highLight(item.singer)
+            })
+            this.singerItemList = res.data.singer.itemlist
+          }
         })
       }
     },
     playSong (item) {
-      this.$store.dispatch('SET_PLAY_LIST', this.resultList)
-      this.$store.commit('SET_CURRENT_INDEX', 0)
-      this.$store.commit('SET_FULL_SCREEN', true)
+      // console.log(item)
+      // item.imgUrlBig = `https://y.gtimg.cn/music/photo_new/T002R800x800M000${item.mid}.jpg?max_age=2592000`
+      // item.imgUrlSmall = `https://y.gtimg.cn/music/photo_new/T002R90x90M000${item.mid}.jpg?max_age=2592000`
+      // let arr = []
+      // arr.push(item)
+      // this.$store.commit('SET_PLAY_LIST', arr)
+      // this.$store.commit('SET_CURRENT_INDEX', 0)
+      // this.$store.commit('SET_FULL_SCREEN', true)
+      // console.log(this.$store.getters.playList)
     },
     backRec () {
       this.$router.push('/recommend')
@@ -130,8 +139,44 @@ export default {
         this.keywords = ''
       }
     },
+    clearHistory () {
+      this.$createDialog({
+        type: 'confirm',
+        icon: 'cubeic-alert',
+        title: '我是标题',
+        content: '我是内容',
+        confirmBtn: {
+          text: '确定按钮',
+          active: true,
+          disabled: false,
+          href: 'javascript:;'
+        },
+        cancelBtn: {
+          text: '取消按钮',
+          active: false,
+          disabled: false,
+          href: 'javascript:;'
+        },
+        onConfirm: () => {
+          this.$createToast({
+            type: 'warn',
+            time: 1000,
+            txt: '点击确认按钮'
+          }).show()
+        },
+        onCancel: () => {
+          this.$createToast({
+            type: 'warn',
+            time: 1000,
+            txt: '点击取消按钮'
+          }).show()
+        }
+      }).show()
+      // localStorage.removeItem('hotKeys')
+      // this.historyKeyList = []
+    },
     // 高亮显示关键字
-    highLight (result) {
+    _highLight (result) {
       let lastStr = ''
       if (this.keywords && this.keywords.length > 0) {
         let reg = new RegExp(this.keywords, 'g')
@@ -202,17 +247,30 @@ export default {
       font-size: rem(16);
       .search-word{
         line-height: 1.2;
+        margin-left: rem(16);
+        color: $app-color;
+      }
+      .title-singer{
+        padding: rem(16) 0 0 rem(16);
+      }
+      .title-song{
+        padding: rem(16) 0 0 rem(16);
       }
       .search-item{
         @include ellipsis();
-        margin: rem(16) 0;
         .search-item-icon{
           display: inline-block;
-          margin-right: rem(16);
+          padding: rem(16);
         }
         & /deep/ .search-result{
           color: $app-color;
         }
+      }
+      .loading-container{
+        position: absolute;
+        width: 100%;
+        top: 50%;
+        transform: translateY(-50%);
       }
     }
     .search-content{

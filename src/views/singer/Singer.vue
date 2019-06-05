@@ -5,7 +5,7 @@
       <span>歌手</span>
       <div class="fontFamily icon">&#xe638;</div>
     </div>
-    <cube-index-list
+    <!-- <cube-index-list
       :data="cityData">
       <cube-index-list-group
         v-for="(group, index) in cityData"
@@ -23,12 +23,12 @@
           </div>
         </cube-index-list-item>
       </cube-index-list-group>
-    </cube-index-list>
+    </cube-index-list> -->
   </div>
 </template>
 
 <script>
-import { getSearch, getRankListDetails, getSongUrl } from 'api/music'
+// import { getSearch, getRankListDetails, getSongUrl } from 'api/music'
 export default {
   data () {
     return {
@@ -64,12 +64,12 @@ export default {
     }
   },
   created () {
-    let key = {
-      'id': 26,
-      'time': '2019-05-30'
-    }
-    getRankListDetails(key).then(res => {
-    })
+    // let key = {
+    //   'id': 26,
+    //   'time': '2019-05-30'
+    // }
+    // getRankListDetails(key).then(res => {
+    // })
   },
   methods: {
     selectItem () {

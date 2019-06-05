@@ -3,11 +3,16 @@
     <div>
       <m-header @handleClick="toSearch"></m-header>
       <div class="slide">
-        <cube-slide :data="items" :autoPlay="false">
+        <!-- <cube-slide :data="items" :autoPlay="false">
           <template slot="dots" slot-scope="props">
             <span class="my-dot" :class="{active: props.current === index}" v-for="(item, index) in props.dots" :key="item">{{index + 1}}</span>
           </template>
-        </cube-slide>
+        </cube-slide> -->
+        <van-swipe >
+          <van-swipe-item v-for="(item, index) in items" :key="index">
+            <img v-lazy="item.image" />
+          </van-swipe-item>
+        </van-swipe>
       </div>
       <div class="tab">
         <router-link tag="div" class="tab-item" to="/singer">
@@ -62,9 +67,6 @@ export default {
     MHeader
   },
   created () {
-    // getTest().then(res => {
-    //   console.log(res)
-    // })
     getSlider().then(res => {
       let a = []
       let data = JSON.parse(res.body).data
@@ -105,17 +107,16 @@ export default {
     overflow: hidden;
     background: $bg;
     .slide{
-      // width: rem(343);
+      width: rem(343);
       height: rem(150);
       box-sizing: border-box;
-      margin: 0 rem(16);
+      margin: 0 auto;
       border-radius: rem(10);
       overflow: hidden;
-      .my-dot{
-        height: rem(8);
-        width: rem(8);
-        border-radius: rem(4);
-        margin: 0 rem(4);
+      img{
+        font-size: 0;
+        width: 100%;
+        height: rem(150);
       }
     }
     .tab{

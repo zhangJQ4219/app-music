@@ -4,28 +4,35 @@
       <span>{{list.title}}</span>
       <div class="fontFamily tab-icon">更多 &#xe631;</div>
     </div>
-    <cube-scroll
+    <!-- <cube-scroll
       ref="scroll"
       :data="list.list"
       direction="horizontal"
-      class="horizontal-scroll-list-wrap">
+      class="horizontal-scroll-list-wrap"> -->
+    <m-scroll :data="list.list" :scrollX="true" class="wrapper">
       <ul class="list-wrapper">
         <li v-for="item in list.list" class="list-item" :key="item.content_id">
           <div class="item">
             <div class="play">
-              <div class="fontFamily play-icon">&#xe68e; {{item.access_num | getNum}}</div>
+              <div class="fontFamily play-icon">&#xe608; {{item.access_num | getNum}}</div>
             </div>
             <img :src="item.cover_url_small" alt="">
             <p>{{item.title}}</p>
           </div>
         </li>
       </ul>
-    </cube-scroll>
+    </m-scroll>
+    <!-- </cube-scroll> -->
   </div>
 </template>
 
 <script>
+
+import MScroll from '@/components/m-scroll'
 export default {
+  components: {
+    MScroll
+  },
   props: {
     list: {
       type: Object,
@@ -46,24 +53,16 @@ export default {
         return value
       }
     }
-  },
-  data () {
-    return {
-
-    }
-  },
-  created () {
-    console.log(this.list)
   }
 }
 </script>
 
 <style lang='scss' scoped>
 @import '~/style/variables.scss';
-  .horizontal-scroll-list-wrap /deep/ .cube-scroll-content{
-    display: inline-block;
-    white-space: wrap;
-  }
+  // .horizontal-scroll-list-wrap /deep/ .cube-scroll-content{
+  //   display: inline-block;
+  //   white-space: wrap;
+  // }
   .title{
     height: rem(40);
     display: flex;
@@ -78,12 +77,14 @@ export default {
       font-size: rem(14);
     }
   }
-  .horizontal-scroll-list-wrap{
+  // .horizontal-scroll-list-wrap{
+  .wrapper{
+    width: rem(375);
     .list-wrapper{
       padding: 0 rem(16);
       white-space: nowrap;
+      width: rem(696);
       .list-item{
-         // inline-block 无法对齐
         display: inline-flex;
         .item{
           width: rem(106);

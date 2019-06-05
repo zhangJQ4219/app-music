@@ -113,6 +113,7 @@ export default {
       this.$store.commit('SET_PLAY_LIST', this.topListDetails)
       this.$store.commit('SET_CURRENT_INDEX', index)
       this.$store.commit('SET_FULL_SCREEN', true)
+      this.$store.commit('SET_PLAYING', true)
     }
   }
 }
@@ -160,13 +161,14 @@ export default {
     .bg-layer{
       position: relative;
       height: 100%;
-      background-color: #fff;
+      background-color: #eee;
     }
     .list{
       position: fixed;
       top: 0;
       bottom: 0;
       width: 100%;
+      background: #eee;
       .music{
         padding:rem(8) rem(16);
         .song-name{

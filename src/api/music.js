@@ -36,13 +36,6 @@ export function getRankListDetails (params) {
   })
 }
 
-// export function search (params) {
-//   return request({
-//     url: `https://music.niubishanshan.top/api/v2/music/search/${params}`,
-//     method: 'get'
-//   })
-// }
-
 export function getMusicList () {
   return request({
     url: 'https://www.easy-mock.com/mock/5cb429769e5e43437f720ad8/example/getMusicList',
@@ -72,5 +65,13 @@ export function getSongUrl (params) {
     url: '/getSongUrl',
     method: 'get',
     params
+  })
+}
+
+// 获取热搜榜
+export function getHotKeys () {
+  return request({
+    url: '/getHotKeys',
+    method: 'get'
   })
 }

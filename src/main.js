@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import './cube-ui'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -13,6 +12,9 @@ import './assets/style/border.css'
 import fastclick from 'fastclick'
 // 引入iconfont
 import './assets/iconfont/iconfont.css'
+
+import { Swipe, SwipeItem, Lazyload } from 'vant'
+Vue.use(Swipe).use(SwipeItem).use(Lazyload)
 
 fastclick.attach(document.body)
 
