@@ -1,8 +1,8 @@
 <template>
   <div class="music-list" @touchmove.prevent>
     <div class="fontFamily back-icon" @click="back">&#xe606;</div>
-    <div class="title">{{title}}</div>
-    <div class="bg-img" :style="bgImg" ref="bgImg">
+    <!-- <div class="title">{{title}}</div> -->
+    <div class="bg-img" v-lazy:background-image="musicList.picUrl" ref="bgImg">
     </div>
     <div class="bg-layer" ref="layer"></div>
     <m-scroll :data="topListDetails" @scroll="scroll"
@@ -24,7 +24,10 @@
 import { mapGetters } from 'vuex'
 import { getRankListDetails } from 'api/music.js'
 import MScroll from '@/components/m-scroll'
+// import { playlistMixin } from '@/utils/mixin'
+
 export default {
+  // mixins: [playlistMixin],
   components: {
     MScroll
   },
@@ -53,8 +56,8 @@ export default {
   },
   computed: {
     bgImg () {
-      // return `background-image:url(${this.bgImage})`
-      return `background-image:url("https://y.gtimg.cn/music/photo_new/T002R300x300M000003c616O2Zlswm.jpg?max_age=2592000")`
+      return `background-image:url(${this.musicList.picUrl})`
+      // return `background-image:url("http://y.gtimg.cn/music/photo_new/T003R300x300M000002jfbMH2hdGnC.jpg")`
     },
     ...mapGetters(['musicList'])
   },
@@ -83,8 +86,12 @@ export default {
     }
   },
   methods: {
+    // handlePlaylist (playlist) {
+    //   const bottom = playlist.length > 0 ? '60px' : ''
+    //   this.$refs.list.$el.style.bottom = bottom
+    //   this.$refs.list.refresh()
+    // },
     back () {
-      console.log('s')
       this.$router.push('/rank')
     },
     scroll (pos) {

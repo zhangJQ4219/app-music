@@ -44,7 +44,7 @@
             <div class="fontFamily btn-middle" @click="prev" :class="disableCls">&#xe607;</div>
             <div class="fontFamily btn-big" @click="playSong" :class="disableCls" v-html="playIcon"></div>
             <div class="fontFamily btn-middle" @click="next" :class="disableCls">&#xe62c;</div>
-            <div class="fontFamily btn-small" >&#xe717;</div>
+            <div class="fontFamily btn-small" @click="showList">&#xe717;</div>
           </div>
         </div>
       </div>
@@ -58,9 +58,19 @@
       </div>
       <div class="right">
         <div class="fontFamily btn-play" @click.stop="playSong" v-html="playIcon"></div>
-        <div class="fontFamily btn-list">&#xe717;</div>
+        <div class="fontFamily btn-list" @click.stop="showListMini">&#xe717;</div>
       </div>
     </div>
+    <m-bottomlist
+      v-if="stateList"
+      :playList="playList"
+      :listClass="listClass"
+      :currentIndex="currentIndex"
+      @close="closeList"
+      @playListMusic="playListMusic"
+    >
+    </m-bottomlist>
+
       <audio ref="audio" muted :src="currentSongUrl" @canplay="ready" @error="error" @ended="end"  @timeupdate="updateTime"></audio>
   </div>
 </template>
@@ -72,12 +82,14 @@ import { mapGetters } from 'vuex'
 import { Base64 } from 'js-base64'
 import Lyric from 'lyric-parser'
 import MScroll from '@/components/m-scroll'
+import MBottomlist from '@/components/m-bottomlist'
 // import { getMusicList } from 'api/music.js'
 
 export default {
   components: {
     MProgress,
-    MScroll
+    MScroll,
+    MBottomlist
   },
   data () {
     return {
@@ -87,7 +99,11 @@ export default {
       currentLyric: null,
       currentLine: 0,
       currentShow: 'cd',
-      currentSongUrl: null
+      currentSongUrl: null,
+      stateList: false, // 列表状态
+      listClass: 'white', // 列表样式
+      timer: null,
+      timer1: null
     }
   },
   created () {
@@ -108,7 +124,6 @@ export default {
         this.$refs.audio.currentTime = 0
       }
       this._getSongLyric()
-      console.log(this.currentSongUrl)
       setTimeout(() => {
         // this.$store.commit('SET_PLAYING', true)
         this.$refs.audio.play()
@@ -163,6 +178,23 @@ export default {
       this.songReady = true
       this.duration = this.$refs.audio.duration
     },
+    playListMusic (index, item) {
+      this.$store.commit('SET_CURRENT_INDEX', index)
+      this.$store.commit('SET_PLAYING', true)
+      this.stateList = false
+    },
+    // 展示列表
+    showList () {
+      this.stateList = true
+      this.listClass = 'black'
+    },
+    showListMini () {
+      this.stateList = true
+      this.listClass = 'white'
+    },
+    closeList () {
+      this.stateList = false
+    },
     // 底部显示
     handleMini () {
       this.$store.commit('SET_FULL_SCREEN', !this.fullScreen)
@@ -183,43 +215,53 @@ export default {
     },
     // 下一首
     next () {
-      if (!this.songReady) {
-        return
+      if (this.timer !== null) {
+        clearTimeout(this.timer)
       }
-      if (this.playList.length === 1) {
-        this.loop()
-        return
-      } else {
-        let index = this.currentIndex + 1
-        if (index === this.playList.length) {
-          index = 0
+      this.timer = setTimeout(() => {
+        if (!this.songReady) {
+          return
         }
-        this.$store.commit('SET_CURRENT_INDEX', index)
-        if (!this.playing) {
-          this.playSong()
+        if (this.playList.length === 1) {
+          this.loop()
+          return
+        } else {
+          let index = this.currentIndex + 1
+          if (index === this.playList.length) {
+            index = 0
+          }
+          this.$store.commit('SET_CURRENT_INDEX', index)
+          if (!this.playing) {
+            this.playSong()
+          }
         }
-      }
-      this.songReady = false
+        this.songReady = false
+      }, 1000)
     },
     // 上一首
     prev () {
-      if (!this.songReady) {
-        return
+      if (this.timer1 !== null) {
+        clearTimeout(this.timer1)
       }
-      if (this.playList.length === 1) {
-        this.loop()
-        return
-      } else {
-        let index = this.currentIndex - 1
-        if (index === -1) {
-          index = this.playList.length - 1
+      this.timer1 = setTimeout(() => {
+        if (!this.songReady) {
+          return
         }
-        this.$store.commit('SET_CURRENT_INDEX', index)
-        if (!this.playing) {
-          this.playSong()
+        if (this.playList.length === 1) {
+          this.loop()
+          return
+        } else {
+          let index = this.currentIndex - 1
+          if (index === -1) {
+            index = this.playList.length - 1
+          }
+          this.$store.commit('SET_CURRENT_INDEX', index)
+          if (!this.playing) {
+            this.playSong()
+          }
         }
-      }
-      this.songReady = false
+        this.songReady = false
+      }, 1000)
     },
     // 改变模式
     changeMode () {
@@ -379,10 +421,10 @@ export default {
 <style lang='scss' scoped>
 @import '~/style/variables.scss';
 .player{
-  animation: appear .1s linear;
-  position: fixed;
+  animation: appear .1s linear forwards;
+  position: absolute;
   left: 0;
-  top: 0;
+  top: rem(660);
   right: 0;
   bottom: 0;
   z-index: 150;
@@ -529,7 +571,7 @@ export default {
 .player-mini{
   display: flex;
   align-items: center;
-  position: fixed;
+  position: absolute;
   left: 0;
   bottom: 0;
   z-index: 180;

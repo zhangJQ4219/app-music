@@ -16,7 +16,7 @@
             <div class="play">
               <div class="fontFamily play-icon">&#xe608; {{item.access_num | getNum}}</div>
             </div>
-            <img :src="item.cover_url_small" alt="">
+            <img v-lazy="item.cover_url_small" alt="">
             <p>{{item.title}}</p>
           </div>
         </li>
