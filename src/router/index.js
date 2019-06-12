@@ -17,7 +17,12 @@ export default new Router({
     {
       path: '/search',
       name: 'search',
-      component: () => import('../views/search/Search.vue')
+      component: () => import('../views/search/Search.vue'),
+      children: [{
+        path: ':id',
+        name: 'searchList',
+        component: () => import('../views/searchList/SearchList.vue')
+      }]
     },
     {
       path: '/rank',

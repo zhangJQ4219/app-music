@@ -1,6 +1,8 @@
 <template>
   <div id="app">
+    <keep-alive :include="['recommend', 'rank']">
     <router-view/>
+      </keep-alive>
     <player></player>
   </div>
 </template>

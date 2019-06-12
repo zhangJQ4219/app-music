@@ -6,13 +6,14 @@ export function getTest () {
   })
 }
 
+// 获取轮播图信息
 export function getSlider () {
   return request({
     url: '/getSlider',
     method: 'get'
   })
 }
-
+// 获取推荐列表
 export function getRecommend () {
   return request({
     url: '/getRecommend',
@@ -27,19 +28,12 @@ export function getRankList () {
   })
 }
 
-//
+// 获取单个排行榜歌曲列表
 export function getRankListDetails (params) {
   return request({
     url: '/getTopListDetails',
     method: 'get',
     params
-  })
-}
-
-export function getMusicList () {
-  return request({
-    url: 'https://www.easy-mock.com/mock/5cb429769e5e43437f720ad8/example/getMusicList',
-    method: 'get'
   })
 }
 
@@ -51,6 +45,25 @@ export function getSearch (params) {
     params
   })
 }
+
+// 获取歌手搜索信息或者歌曲信息
+export function getSearchInfo (params) {
+  return request({
+    url: '/getSearchInfo',
+    method: 'get',
+    params
+  })
+}
+
+// 获取歌曲详情
+export function getSearchSong (params) {
+  return request({
+    url: '/getSearchSong',
+    method: 'get',
+    params
+  })
+}
+
 // 获取歌词
 export function getLyric (params) {
   return request({

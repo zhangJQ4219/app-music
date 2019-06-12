@@ -11,7 +11,8 @@ const music = {
     musicList: {}, // 排行榜歌曲列表
     fullScreen: false, // 是否全屏
     currentIndex: -1, // 当前歌曲索引
-    mode: playMode.sequence // 播放模式
+    mode: playMode.sequence, // 播放模式,
+    searchKey: null // 搜索关键词
   },
   mutations: {
     SET_PLAYING (state, value) {
@@ -34,6 +35,9 @@ const music = {
     },
     SET_RANK_DETAILS (state, list) {
       state.rankListDetails = list
+    },
+    SET_SEARCH_KEY (state, value) {
+      state.searchKey = value
     }
   },
   actions: {
@@ -58,6 +62,12 @@ const music = {
     SET_MUSIC_LIST ({ commit }, list) {
       return new Promise((resolve, reject) => {
         commit('SET_MUSIC_LIST', list)
+        resolve()
+      })
+    },
+    SET_SEARCH_KEY ({ commit }, value) {
+      return new Promise((resolve, reject) => {
+        commit('SET_SEARCH_KEY', value)
         resolve()
       })
     }

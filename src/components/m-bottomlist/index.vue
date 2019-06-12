@@ -1,17 +1,19 @@
 <template>
   <div class="container">
     <div class="bg" @click="handleClose"></div>
-    <div class="bottom-wrapper" :class="listClass">
-      <m-scroll class="scroll-wrapper" ref="wrapper" :data="playList">
-        <div class="wrapper">
-          <div v-for="(item, index) in playList" :key="item.songName" class="music" ref="music" @click="playMusic(index, item)" :class="[listClass, {'first': index === 0}]">
-            <span class="song" :class="{'current': currentIndex === index}">{{item.title}} - </span>
-            <span class="singer" :class="[listClass, {'current': currentIndex === index}]">{{item.singer[0].name}}</span>
+    <transition name="bottom">
+      <div class="bottom-wrapper" v-if="state" :class="listClass">
+        <m-scroll class="scroll-wrapper" ref="wrapper" :data="playList">
+          <div class="wrapper">
+            <div v-for="(item, index) in playList" :key="item.songName" class="music" ref="music" @click="playMusic(index, item)" :class="[listClass, {'first': index === 0}]">
+              <span class="song" :class="{'current': currentIndex === index}">{{item.title}} - </span>
+              <span class="singer" :class="[listClass, {'current': currentIndex === index}]">{{item.singers}}</span>
+            </div>
           </div>
-        </div>
-      </m-scroll>
-      <div class="close" @click="handleClose">关闭</div>
-    </div>
+        </m-scroll>
+        <div class="close" @click="handleClose">关闭</div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -25,6 +27,10 @@ export default {
       default: () => {
         return []
       }
+    },
+    state: {
+      type: Boolean,
+      default: false
     },
     listClass: {
       type: String,
@@ -48,15 +54,17 @@ export default {
   watch: {
     currentIndex: {
       handler () {
-        this.$nextTick(() => {
+        setTimeout(() => {
           if (this.currentIndex > 5) {
-            setTimeout(() => {
+            if ((this.playList.length - this.currentIndex) < 4) {
+              this.$refs.wrapper.scrollTo(0, -(this.currentIndex - 6) * 46, 500)
+            } else {
               this.$refs.wrapper.scrollTo(0, -(this.currentIndex - 3) * 46, 500)
-            }, 100)
+            }
           } else {
             this.$refs.wrapper.scrollTo(0, 0, 500)
           }
-        })
+        }, 100)
       },
       immediate: true
     }
@@ -75,25 +83,31 @@ export default {
 
 <style lang='scss' scoped>
 @import '~/style/variables.scss';
+.bottom-enter-active, .bottom-leave-active {
+  transition: all .2s;
+  transform: translateY(0);
+}
+.bottom-enter, .bottom-leave-to {
+  transform: translateY(rem(667));
+}
 .container{
   .bg{
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
-    z-index: 999;
+    right: 0;
+    bottom: 0;
+    z-index: 998;
     opacity: 0;
-    width: 100%;
-    height: rem(600);
     background-color: #000;
-    animation: bg .1s linear forwards;
+    animation: bg .2s linear forwards;
   }
   .bottom-wrapper{
-    animation: list .1s linear forwards;
-    position: absolute;
+    position: fixed;
+    height: rem(520);
     left: 0;
-    bottom: rem(0);
+    bottom: 0;
     right: 0;
-    top: rem(667);
     z-index: 999;
     font-size: rem(14);
     &.white{
@@ -112,6 +126,7 @@ export default {
       .wrapper{
         .music{
           padding: rem(16) rem(16);
+          @include ellipsis();
           .current{
             color: $app-color;
           }
@@ -144,16 +159,6 @@ export default {
       font-size: rem(16);
     }
   }
-}
-@keyframes list{
-    0%{
-     opacity: 0;
-     top: rem(667);
-    }
-    100%{
-      opacity: 1;
-      top: rem(180);
-    }
 }
 @keyframes bg{
     0%{

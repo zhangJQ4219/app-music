@@ -1,34 +1,26 @@
 import { mapGetters } from 'vuex'
 
-export const playlistMixin = {
+export const playListMixin = {
   computed: {
     ...mapGetters([
-      'playlist'
+      'playList'
     ])
   },
   mounted () {
-    if (this.playlist && this.playlist.length > 0) {
-      console.log('1')
-      this.handlePlaylist(this.playlist)
-    }
-  },
-  activated () {
-    if (this.playlist && this.playlist.length > 0) {
-      console.log('2')
-      this.handlePlaylist(this.playlist)
+    if (this.playList.length > 0) {
+      this.handlePlayList(this.playList)
     }
   },
   watch: {
-    playlist (newVal) {
-      if (this.playlist && this.playlist.length > 0) {
-        console.log('3')
-        this.handlePlaylist(this.playlist)
+    playList (newVal) {
+      if (this.playList.length > 0) {
+        this.handlePlayList(this.playList)
       }
     }
   },
   methods: {
-    handlePlaylist () {
-      throw new Error('handlePlaylist is not defined in components')
+    handlePlayList () {
+      throw new Error('handlePlayList is not defined in components')
     }
   }
 }

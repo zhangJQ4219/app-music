@@ -22,7 +22,7 @@ export default {
     .desc{
       line-height: rem(20);
       font-size: rem(16);
-      color: #333;
+      color: $text-color-dark;
     }
   }
 </style>

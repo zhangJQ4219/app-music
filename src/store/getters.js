@@ -6,6 +6,7 @@ const getters = {
   fullScreen: state => state.music.fullScreen,
   currentIndex: state => state.music.currentIndex,
   mode: state => state.music.mode,
+  searchKey: state => state.music.searchKey,
   currentSong: state => state.music.playList[state.music.currentIndex] || {}
 }
 export default getters

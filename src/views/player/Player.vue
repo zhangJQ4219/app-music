@@ -1,60 +1,62 @@
 <template>
   <div v-show="showPlayer" @touchmove.prevent>
-    <div class="player" v-show="fullScreen">
-      <div class="bg">
-        <img width="100%" height="100%" :src="currentSong.imgUrlBig">
-      </div>
-      <div class="content">
-        <div class="top">
-          <div class="fontFamily top-left" @click="handleMini">&#xe60e;</div>
-          <span class="song-name">{{currentSong.name }}</span>
-          <span class="singer-name">{{currentSong.singer && currentSong.singer[0].name}}</span>
+    <transition name="play">
+      <div class="player" v-show="fullScreen">
+        <div class="bg">
+          <img width="100%" height="100%" :src="currentSong.imgUrlBig">
         </div>
-        <div class="middle"
-          @touchstart.prevent="middleTouchStart"
-          @touchmove.prevent="middleTouchMove"
-          @touchend="middleTouchEnd">
-          <div class="middle-left" ref="middleL">
-            <div class="pic" :class="play">
-              <img width="100%" height="100%" :src="currentSong.imgUrlBig" alt="">
-            </div>
+        <div class="content">
+          <div class="top">
+            <div class="fontFamily top-left" @click="handleMini">&#xe60e;</div>
+            <span class="song-name">{{currentSong.name }}</span>
+            <span class="singer-name">{{currentSong.singers}}</span>
           </div>
-          <m-scroll class="middle-right" ref="lyricList" :data="currentLyric && currentLyric.lines">
-            <div class="lyric-wraaper">
-              <div v-if="currentLyric">
-                <p class="text" ref="lyricLine" :class="{'current': currentLine === index}" v-for="(item, index) in currentLyric.lines" :key="index">{{item.txt}}</p>
+          <div class="middle"
+            @touchstart.prevent="middleTouchStart"
+            @touchmove.prevent="middleTouchMove"
+            @touchend="middleTouchEnd">
+            <div class="middle-left" ref="middleL">
+              <div class="pic" :class="play">
+                <img width="100%" height="100%" :src="currentSong.imgUrlBig" alt="">
               </div>
             </div>
-          </m-scroll>
-        </div>
-        <div class="bottom">
-          <div class="dot-wrapper">
-            <span class="dot" :class="{'active': currentShow === 'cd'}"></span>
-            <span class="dot" :class="{'active': currentShow === 'lyric'}"></span>
+            <m-scroll class="middle-right" ref="lyricList" :data="currentLyric && currentLyric.lines">
+              <div class="lyric-wraaper">
+                <div v-if="currentLyric">
+                  <p class="text" ref="lyricLine" :class="{'current': currentLine === index}" v-for="(item, index) in currentLyric.lines" :key="index">{{item.txt}}</p>
+                </div>
+              </div>
+            </m-scroll>
           </div>
-          <div class="progress-wrapper">
-            <span class="time">{{currentTime | formatDate}}</span>
-            <div class="progress-content">
-              <m-progress :percent="percent" @percentChange="changeProgress"></m-progress>
+          <div class="bottom">
+            <div class="dot-wrapper">
+              <span class="dot" :class="{'active': currentShow === 'cd'}"></span>
+              <span class="dot" :class="{'active': currentShow === 'lyric'}"></span>
             </div>
-            <span class="time">{{duration | formatDate}}</span>
-          </div>
-          <div class="btn-wrapper">
-            <div class="fontFamily btn-small" @click="changeMode" v-html="modeIcon"></div>
-            <div class="fontFamily btn-middle" @click="prev" :class="disableCls">&#xe607;</div>
-            <div class="fontFamily btn-big" @click="playSong" :class="disableCls" v-html="playIcon"></div>
-            <div class="fontFamily btn-middle" @click="next" :class="disableCls">&#xe62c;</div>
-            <div class="fontFamily btn-small" @click="showList">&#xe717;</div>
+            <div class="progress-wrapper">
+              <span class="time">{{currentTime | formatDate}}</span>
+              <div class="progress-content">
+                <m-progress :percent="percent" @percentChange="changeProgress"></m-progress>
+              </div>
+              <span class="time">{{duration | formatDate}}</span>
+            </div>
+            <div class="btn-wrapper">
+              <div class="fontFamily btn-small" @click="changeMode" v-html="modeIcon"></div>
+              <div class="fontFamily btn-middle" @click="prev" :class="disableCls">&#xe607;</div>
+              <div class="fontFamily btn-big" @click="playSong" :class="disableCls" v-html="playIcon"></div>
+              <div class="fontFamily btn-middle" @click="next" :class="disableCls">&#xe62c;</div>
+              <div class="fontFamily btn-small" @click="showList">&#xe717;</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </transition>
     <div class="player-mini" v-show="!fullScreen" @click="handleOpen">
       <div class="left" :class="play">
         <img class="pic-mini" :src="currentSong.imgUrlSmall" alt="">
       </div>
       <div class="middle">
-        <span class="middle-name-mini">{{currentSong.name}} - {{currentSong.singer && currentSong.singer[0].name}}</span>
+        <span class="middle-name-mini">{{currentSong.name}} - {{currentSong.singers}}</span>
       </div>
       <div class="right">
         <div class="fontFamily btn-play" @click.stop="playSong" v-html="playIcon"></div>
@@ -63,6 +65,7 @@
     </div>
     <m-bottomlist
       v-if="stateList"
+      :state="stateList"
       :playList="playList"
       :listClass="listClass"
       :currentIndex="currentIndex"
@@ -70,8 +73,7 @@
       @playListMusic="playListMusic"
     >
     </m-bottomlist>
-
-      <audio ref="audio" muted :src="currentSongUrl" @canplay="ready" @error="error" @ended="end"  @timeupdate="updateTime"></audio>
+      <audio ref="audio" :src="currentSongUrl" @canplay="ready" @error="error" @ended="end"  @timeupdate="updateTime"></audio>
   </div>
 </template>
 
@@ -127,7 +129,8 @@ export default {
       setTimeout(() => {
         // this.$store.commit('SET_PLAYING', true)
         this.$refs.audio.play()
-      }, 500)
+        this.duration = this.$refs.audio.duration
+      }, 1000)
     },
     playing (newPlaying) {
       this.$nextTick(() => {
@@ -176,7 +179,6 @@ export default {
   methods: {
     ready () {
       this.songReady = true
-      this.duration = this.$refs.audio.duration
     },
     playListMusic (index, item) {
       this.$store.commit('SET_CURRENT_INDEX', index)
@@ -318,8 +320,19 @@ export default {
       let params = {
         songmid: this.currentSong.mid
       }
+      let that = this
       getSongUrl(params).then(res => {
-        this.currentSongUrl = `${res.data.sip[0]}${res.data.midurlinfo[0].purl}`
+        if (res.data.midurlinfo[0].purl === '') {
+          this.currentSongUrl = `${res.data.sip[0]}${res.data.midurlinfo[0].purl}`
+          this.$dialog.alert({
+            message: '该歌曲暂时无法播放',
+            confirmButtonColor: '#31c27c'
+          }).then(() => {
+            that.next()
+          })
+        } else {
+          this.currentSongUrl = `${res.data.sip[0]}${res.data.midurlinfo[0].purl}`
+        }
       })
     },
     // 获取歌词内容
@@ -327,8 +340,9 @@ export default {
       let params = {
         songmid: this.currentSong.mid
       }
+
+      this._getSongUrl()
       getLyric(params).then(res => {
-        this._getSongUrl()
         this.currentLyric = new Lyric(Base64.decode(res.data.lyric), this.handleLyric)
         if (this.currentLyric.lines.length === 0) {
           this.currentLyric.lines = [{
@@ -342,23 +356,13 @@ export default {
         // this.getAnalysisedLyric(res.data.lyric)
       })
     },
-    // 解析歌词
-    // getAnalysisedLyric (newLyric) {
-    //   this.currentLyric = new Lyric(Base64.decode(newLyric), this.handleLyric)
-    //   if (this.playing) {
-    //     this.currentLyric.play()
-    //   }
-    //   // else {
-    //   //   this.currentLyric.stop()
-    //   // }
-    // },
     handleLyric ({ lineNum, txt }) {
       this.currentLine = lineNum
       if (lineNum > 5) {
         let lineEl = this.$refs.lyricLine[lineNum - 5]
-        this.$refs.lyricList.scrollToElement(lineEl, 500)
+        this.$refs.lyricList.scrollToElement(lineEl, 1000)
       } else {
-        this.$refs.lyricList.scrollTo(0, 0, 500)
+        this.$refs.lyricList.scrollTo(0, 0, 1000)
       }
     },
     middleTouchStart (e) {
@@ -420,15 +424,23 @@ export default {
 
 <style lang='scss' scoped>
 @import '~/style/variables.scss';
+.play-enter-active, .play-leave-active {
+  transition: all .2s;
+  transform: translateY(0);
+}
+.play-enter, .play-leave-to {
+  transform: translateY(rem(667));
+  opacity: 0;
+}
+
 .player{
-  animation: appear .1s linear forwards;
-  position: absolute;
+  position: fixed;
   left: 0;
-  top: rem(660);
   right: 0;
+  top: 0;
   bottom: 0;
   z-index: 150;
-  background: #666;
+  background: $text-color-medium;
   .bg{
     position: absolute;
     left: 0;
@@ -469,8 +481,12 @@ export default {
       }
     }
     .middle{
-      height: calc( 100vh - #{rem(230)});
-      // flex: 1;
+        position: fixed;
+        width: 100%;
+        top: 80px;
+        bottom: 170px;
+
+      // height: calc( 100vh - #{rem(230)});
       overflow: hidden;
       display: inline-flex;
       .middle-left{
@@ -512,8 +528,11 @@ export default {
       }
     }
     .bottom{
-      height: rem(170);
-      padding-top: rem(6);
+      position: absolute;
+        bottom: 50px;
+        width: 100%;
+      // height: rem(170);
+      // padding-top: rem(6);
       .dot-wrapper{
         text-align: center;
         .dot{
@@ -555,13 +574,13 @@ export default {
         .btn-middle{
           font-size: rem(40);
           &.disable{
-            color: #666;
+            color: $text-color-medium;
           }
         }
         .btn-big{
           font-size: rem(50);
           &.disable{
-            color: #666;
+            color: $text-color-medium;
           }
         }
       }
@@ -571,10 +590,10 @@ export default {
 .player-mini{
   display: flex;
   align-items: center;
-  position: absolute;
+  position: fixed;
   left: 0;
   bottom: 0;
-  z-index: 180;
+  z-index: 140;
   width: 100%;
   height: 60px;
   background: #fff;
@@ -626,16 +645,6 @@ export default {
     }
     100%{
       transform: rotate(360deg)
-    }
-}
-@keyframes appear{
-    0%{
-     opacity: 0;
-     top: rem(600);
-    }
-    100%{
-      opacity: 1;
-      top: 0;
     }
 }
 </style>

@@ -13,7 +13,7 @@
         </div> -->
         <div v-for="(item, index) in topListDetails" :key="item.songName" @click="playMusic(index, item)" class="music">
           <p class="song-name">{{index + 1}} {{item.title}}</p>
-          <p class="song-singer">{{item.singer[0].name}}·{{item.title}}</p>
+          <p class="song-singer">{{item.singers}}·{{item.title}}</p>
         </div>
       </div>
     </m-scroll>
@@ -24,10 +24,10 @@
 import { mapGetters } from 'vuex'
 import { getRankListDetails } from 'api/music.js'
 import MScroll from '@/components/m-scroll'
-// import { playlistMixin } from '@/utils/mixin'
+import { playListMixin } from '@/utils/mixin'
 
 export default {
-  // mixins: [playlistMixin],
+  mixins: [playListMixin],
   components: {
     MScroll
   },
@@ -86,11 +86,12 @@ export default {
     }
   },
   methods: {
-    // handlePlaylist (playlist) {
-    //   const bottom = playlist.length > 0 ? '60px' : ''
-    //   this.$refs.list.$el.style.bottom = bottom
-    //   this.$refs.list.refresh()
-    // },
+    // 改变scroll部分高度
+    handlePlayList (playList) {
+      const bottom = playList.length > 0 ? '60px' : ''
+      this.$refs.list.$el.style.bottom = bottom
+      this.$refs.list.refresh()
+    },
     back () {
       this.$router.push('/rank')
     },
@@ -101,13 +102,14 @@ export default {
     getList (id) {
       let params = {
         id,
-        day: '2019-06-03',
-        week: '2019_22'
+        day: '2019-06-10', // this._getNewDay(),
+        week: '2019_22' // this._getWeek()
       }
       getRankListDetails(params).then(res => {
         this.title = res.data.data.title
         let list = res.data.songInfoList
         list.forEach(item => {
+          item.singers = this._getSinger(item.singer)
           item.imgUrlBig = `https://y.gtimg.cn/music/photo_new/T002R800x800M000${item.album.mid}.jpg?max_age=2592000`
           item.imgUrlSmall = `https://y.gtimg.cn/music/photo_new/T002R90x90M000${item.album.mid}.jpg?max_age=2592000`
         })
@@ -121,6 +123,33 @@ export default {
       this.$store.commit('SET_CURRENT_INDEX', index)
       this.$store.commit('SET_FULL_SCREEN', true)
       this.$store.commit('SET_PLAYING', true)
+    },
+    // 获取当年当前周数
+    _getWeek () {
+      let d1 = new Date()
+      let d2 = new Date()
+      d2.setMonth(0)
+      d2.setDate(1)
+      let rq = d1 - d2
+      let days = Math.ceil(rq / (24 * 60 * 60 * 1000))
+      let num = Math.ceil(days / 7)
+      return `${d1.getFullYear()}_${num}`
+    },
+    // 获取当前时间
+    _getNewDay () {
+      let date = new Date()
+      let Str = `${date.getFullYear()}-${((date.getMonth() + 2) < 10 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1))}-${date.getDate()}`
+      return Str
+    },
+    _getSinger (singer) {
+      let ret = []
+      if (!singer) {
+        return ''
+      }
+      singer.forEach((item) => {
+        ret.push(item.name)
+      })
+      return ret.join('/')
     }
   }
 }
@@ -135,7 +164,6 @@ export default {
     left: 0;
     width: 100%;
     height:100%;
-    // background-color: #999;
     .back-icon{
       position: absolute;
       left: 0;
@@ -168,14 +196,14 @@ export default {
     .bg-layer{
       position: relative;
       height: 100%;
-      background-color: #eee;
+      background-color: $list-bg;
     }
     .list{
       position: fixed;
       top: 0;
       bottom: 0;
       width: 100%;
-      background: #eee;
+      background: $list-bg;
       .music{
         padding:rem(8) rem(16);
         .song-name{
@@ -185,7 +213,7 @@ export default {
           color: #000;
         }
         .song-singer{
-          color: #666;
+          color: $text-color-medium;
         }
       }
     }

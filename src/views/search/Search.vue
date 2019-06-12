@@ -11,12 +11,12 @@
     <div class="search-list" v-show="show">
       <span class="search-word">搜索“{{keywords}}”</span>
       <div class="title-singer" v-if="singerItemList.length">歌手</div>
-      <div class="search-item" @click="playSong(item)" v-for="item in singerItemList" :key="item.id">
+      <div class="search-item" @click="handleSearch(item.name)" v-for="item in singerItemList" :key="item.id">
         <div class="fontFamily search-item-icon">&#xe600;</div>
         <span v-html="item.text"></span>
       </div>
       <div class="title-song" v-if="songItemList.length">歌曲</div>
-      <div class="search-item" @click="playSong(item)" v-for="item in songItemList" :key="item.id">
+      <div class="search-item" @click="handleSearch(item.name)" v-for="item in songItemList" :key="item.id">
         <div class="fontFamily search-item-icon">&#xe600;</div>
         <span v-html="item.text"></span>
       </div>
@@ -24,24 +24,28 @@
         <m-loading></m-loading>
       </div>
     </div>
-    <div class="search-content">
-      <div class="search-content-title">
-        <h1>热门搜索</h1>
+    <transition name="fade">
+      <div v-if="hotKeys.length > 0">
+        <div class="search-content">
+          <div class="search-content-title">
+            <h1 v-if="hotKeys.length > 0">热门搜索</h1>
+          </div>
+          <div class="label">
+            <div class="label-item" v-for="item in hotKeys" :key="item.n" @click="handleSearch(item)">{{item.k}}</div>
+          </div>
+        </div>
+        <div class="search-content" v-if="historyKeyList && historyKeyList.length">
+          <div class="search-content-title">
+            <h1>搜索历史</h1>
+            <div class="fontFamily history-icon" @click="clearHistory">&#xe61b;</div>
+          </div>
+          <div class="label">
+            <div class="label-item" v-for="i in historyKeyList" :key="i" @click="handleSearch(i)">{{i}}</div>
+          </div>
+        </div>
       </div>
-      <div class="label">
-        <div class="label-item" v-for="item in hotKeys" :key="item.n">{{item.k}}</div>
-      </div>
-    </div>
-    <div class="search-content" v-if="historyKeyList && historyKeyList.length">
-      <div class="search-content-title">
-        <h1>搜索历史</h1>
-        <cube-button @click="clearHistory">Dialog - btn</cube-button>
-        <div class="fontFamily history-icon" @click="clearHistory">&#xe61b;</div>
-      </div>
-      <div class="label">
-        <div class="label-item" v-for="i in historyKeyList" :key="i">{{i}}</div>
-      </div>
-    </div>
+    </transition>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -61,7 +65,8 @@ export default {
       keywords: '',
       hotKeys: [],
       historyKeyList: JSON.parse(localStorage.getItem('hotKeys')) || [],
-      showHistory: true
+      showHistory: true,
+      state: 1 //
     }
   },
   computed: {
@@ -77,7 +82,11 @@ export default {
   },
   watch: {
     keywords (value) {
-      this.show = value.trim() !== ''
+      this.show = value.trim() !== '' && this.state === 1
+      // if (value.trim()) {
+      //   console.log('watch执行')
+      //   this.$router.push('/search')
+      // }
     }
   },
   created () {
@@ -93,8 +102,16 @@ export default {
   methods: {
     search (e) {
       if (e.keyCode === 13) {
-        this.historyKeyList.push(this.keywords)
-        localStorage.setItem('hotKeys', JSON.stringify(this.historyKeyList))
+        this.handleSearch(this.keywords)
+        if (!this._judgeRepeat(this.keywords) && this.historyKeyList.length < 5) {
+          this.historyKeyList.push(this.keywords)
+          localStorage.setItem('hotKeys', JSON.stringify(this.historyKeyList))
+        }
+        if (!this._judgeRepeat(this.keywords) && this.historyKeyList.length === 5) {
+          this.historyKeyList.shift()
+          this.historyKeyList.push(this.keywords)
+          localStorage.setItem('hotKeys', JSON.stringify(this.historyKeyList))
+        }
       }
     },
     inputing (e) {
@@ -102,7 +119,9 @@ export default {
       let params = {
         key: this.keywords
       }
-      if (this.keywords.trim().length > 0) {
+      this.state = 1
+      if (this.keywords.trim().length > 0 && this.state === 1) {
+        this.$store.commit('SET_SEARCH_KEY', null)
         getSearch(params).then(res => {
           if (res.data.song.itemlist.length > 0) {
             res.data.song.itemlist.forEach((item, index) => {
@@ -120,17 +139,6 @@ export default {
         })
       }
     },
-    playSong (item) {
-      // console.log(item)
-      // item.imgUrlBig = `https://y.gtimg.cn/music/photo_new/T002R800x800M000${item.mid}.jpg?max_age=2592000`
-      // item.imgUrlSmall = `https://y.gtimg.cn/music/photo_new/T002R90x90M000${item.mid}.jpg?max_age=2592000`
-      // let arr = []
-      // arr.push(item)
-      // this.$store.commit('SET_PLAY_LIST', arr)
-      // this.$store.commit('SET_CURRENT_INDEX', 0)
-      // this.$store.commit('SET_FULL_SCREEN', true)
-      // console.log(this.$store.getters.playList)
-    },
     backRec () {
       this.$router.push('/recommend')
     },
@@ -138,52 +146,48 @@ export default {
       if (this.keywords.length > 0) {
         this.keywords = ''
       }
+      this.$store.dispatch('SET_SEARCH_KEY', null)
+        .then(() => {
+          this.$router.push('/search')
+          // this.$router.push({ name: 'searchList', params: { id: encodeURIComponent(item.k) } })
+        })
     },
     clearHistory () {
-      this.$createDialog({
-        type: 'confirm',
-        icon: 'cubeic-alert',
-        title: '我是标题',
-        content: '我是内容',
-        confirmBtn: {
-          text: '确定按钮',
-          active: true,
-          disabled: false,
-          href: 'javascript:;'
-        },
-        cancelBtn: {
-          text: '取消按钮',
-          active: false,
-          disabled: false,
-          href: 'javascript:;'
-        },
-        onConfirm: () => {
-          this.$createToast({
-            type: 'warn',
-            time: 1000,
-            txt: '点击确认按钮'
-          }).show()
-        },
-        onCancel: () => {
-          this.$createToast({
-            type: 'warn',
-            time: 1000,
-            txt: '点击取消按钮'
-          }).show()
-        }
-      }).show()
-      // localStorage.removeItem('hotKeys')
-      // this.historyKeyList = []
+      this.$dialog.confirm({
+        message: '是否清空所有搜索历史',
+        cancelButtonColor: '#31c27c',
+        confirmButtonText: '清空',
+        confirmButtonColor: '#000'
+      }).then(() => {
+        localStorage.removeItem('hotKeys')
+        this.historyKeyList = []
+      }).catch(() => {
+      })
+    },
+    handleSearch (item) {
+      this.state = 2
+      let name = item.k ? item.k.trim() : item
+      this.keywords = name
+      this.$refs.input.blur()
+      this.$store.dispatch('SET_SEARCH_KEY', name)
+        .then(() => {
+          this.$router.push({ name: 'searchList', params: { id: name } })
+          // this.$router.push({ name: 'searchList', params: { id: encodeURIComponent(item.k) } })
+        })
     },
     // 高亮显示关键字
     _highLight (result) {
       let lastStr = ''
       if (this.keywords && this.keywords.length > 0) {
-        let reg = new RegExp(this.keywords, 'g')
+        let reg = new RegExp(this.keywords.trim(), 'g')
         let str = `<span class="search-result">${this.keywords}</span>`
         lastStr = result.replace(reg, str)
       }
       return lastStr
+    },
+    // 判断历史搜索是否有重复
+    _judgeRepeat (key) {
+      return this.historyKeyList.includes(key)
     }
   }
 }
@@ -191,6 +195,12 @@ export default {
 
 <style lang='scss' scoped>
   @import '~/style/variables.scss';
+.fade-enter-active, .fade-leave-active {
+  transition: all .3s;
+}
+.fade-enter, .fade-leave-to {
+  margin-top: rem(100)
+}
   .search-header{
      background-color: $bg;
      height: 100vh;
@@ -215,7 +225,7 @@ export default {
         display: inline-flex;
         .search-input{
           flex: 1;
-          caret-color: #009a61;
+          caret-color: $app-color;
           font-size: rem(16);
           line-height: rem(30);
           &::-webkit-search-cancel-button{
@@ -228,12 +238,12 @@ export default {
           display: inline-block;
           line-height: rem(30);
           text-align: center;
-          color: $text-color1;
+          color: $text-color-light;
         }
       }
     }
     .search-list{
-      z-index: 2;
+      // z-index: 2;
       position: absolute;
       top: rem(48);
       left: 0;
@@ -243,7 +253,7 @@ export default {
       background-color: $bg;
       display: flex;
       flex-direction: column;
-      margin: rem(16);
+      padding: rem(16);
       font-size: rem(16);
       .search-word{
         line-height: 1.2;

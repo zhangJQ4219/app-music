@@ -5,6 +5,9 @@
       <span>歌手</span>
       <div class="fontFamily icon">&#xe638;</div>
     </div>
+    <div class="singer-wrapper">
+      <p class="text">快出去，我还没写好</p>
+    </div>
     <!-- <cube-index-list
       :data="cityData">
       <cube-index-list-group
@@ -101,18 +104,15 @@ export default {
       display: inline-block;
     }
   }
-  .cube-index-list{
-    height: calc( 100vh - #{rem(50)} );
-    .custom-item{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: rem(8) rem(16);
-      img{
-        border-radius: rem(25);
-        width: rem(50);
-        height: rem(50);
-      }
+  .singer-wrapper{
+    position: relative;
+    width: 100%;
+    height: rem(300);
+    .text{
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%)
     }
   }
 </style>

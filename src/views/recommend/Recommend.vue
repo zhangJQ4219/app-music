@@ -43,6 +43,7 @@ import BScroll from 'better-scroll'
 import { getRecommend, getSlider } from 'api/music.js'
 
 export default {
+  name: 'recommend',
   data () {
     return {
       items: [
@@ -126,7 +127,7 @@ export default {
       .tab-item{
         flex: 1;
         text-align: center;
-        color: $text-color1;
+        color: $text-color-light;
         padding-bottom: rem(10);
         cursor: pointer;
         .tab-icon{

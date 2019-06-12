@@ -29,6 +29,7 @@
 import { getRankList } from 'api/music.js'
 import { mapGetters } from 'vuex'
 export default {
+  name: 'rank',
   data () {
     return {
       rankList: {}
@@ -38,7 +39,7 @@ export default {
     // 获取排行榜数据
     getRankList().then(res => {
       // this.rankList = res.data.topList
-      this.rankList = res.data.topList.slice(0, 1)
+      this.rankList = res.data.topList
     })
   },
   computed: {
@@ -123,7 +124,7 @@ export default {
               line-height: 1.2;
             }
             .singer-name{
-              color: $text-color1;
+              color: $text-color-light;
               line-height: 1.2;
             }
           }
@@ -132,7 +133,7 @@ export default {
       .img{
         width: rem(106);
         height: rem(106);
-        background-color: #333;
+        background-color: $text-color-dark;
         img{
           width: 100%;
         }
