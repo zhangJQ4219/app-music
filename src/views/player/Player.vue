@@ -129,7 +129,6 @@ export default {
       setTimeout(() => {
         // this.$store.commit('SET_PLAYING', true)
         this.$refs.audio.play()
-        this.duration = this.$refs.audio.duration
       }, 1000)
     },
     playing (newPlaying) {
@@ -179,6 +178,9 @@ export default {
   methods: {
     ready () {
       this.songReady = true
+      setTimeout(() => {
+        this.duration = this.$refs.audio.duration
+      }, 1000)
     },
     playListMusic (index, item) {
       this.$store.commit('SET_CURRENT_INDEX', index)

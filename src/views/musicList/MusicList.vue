@@ -102,8 +102,10 @@ export default {
     getList (id) {
       let params = {
         id,
-        day: '2019-06-10', // this._getNewDay(),
-        week: '2019_22' // this._getWeek()
+        // day: '2019-06-10',
+        day: this._getNewDay(),
+        week: '2019_22'
+        // week: this._getWeek()
       }
       getRankListDetails(params).then(res => {
         this.title = res.data.data.title
