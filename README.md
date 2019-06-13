@@ -12,7 +12,7 @@ npm版本 ： **v5.6.0**
 
 构建工具 ： **vue-cli3**
 
-页面UI   ： **vant**
+页面UI     ： **vant**
 
 项目图标   ： **iconfont**
 
@@ -54,13 +54,13 @@ __本接口所有数据均来自 QQ 音乐, 仅供学习交流之用,请不要�
 
 * rem适配
     > 通过在入口文件设置html字体大小(详见APP.vue文件)，在通过在.scss文件中创建rem函数
-    ``` 一般开发都是以375*667为标准
+    ```
     @function rem($px) {
       $rem: 37.5;
       @return ($px / $rem ) + rem;
     }
     ```
-    ``` 例如UI宽度为100px
+    ```
     width: rem(100)
     ```
 

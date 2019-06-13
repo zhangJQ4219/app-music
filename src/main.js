@@ -17,7 +17,7 @@ import { Swipe, SwipeItem, Lazyload, Dialog } from 'vant'
 Vue.use(Lazyload, {
   preLoad: 1.3,
   error: require('./assets/load/error.jpg'),
-  loading: require('./assets/load/loading.gif'),
+  loading: require('./assets/load/loading.jpg'),
   attempt: 1
 })
 Vue.use(Swipe).use(SwipeItem).use(Lazyload).use(Dialog)
