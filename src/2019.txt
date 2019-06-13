@@ -1,0 +1,87 @@
+卷 NewDisk 的文件夹 PATH 列表
+卷序列号为 C87E-4F75
+E:.
+│  2019.txt
+│  App.vue
+│  main.js
+│  registerServiceWorker.js
+│  
+├─api
+│      music.js
+│      
+├─assets
+│  │  logo.png
+│  │  
+│  ├─iconfont
+│  │      iconfont.css
+│  │      iconfont.eot
+│  │      iconfont.svg
+│  │      iconfont.ttf
+│  │      iconfont.woff
+│  │      
+│  ├─load
+│  │      error.jpg
+│  │      loading.gif
+│  │      
+│  └─style
+│          border.css
+│          reset.css
+│          variables.scss
+│          
+├─components
+│  ├─m-bottomlist
+│  │      index.vue
+│  │      
+│  ├─m-header
+│  │      index.vue
+│  │      logo.png
+│  │      
+│  ├─m-loading
+│  │      index.vue
+│  │      loading.gif
+│  │      
+│  └─m-scroll
+│          index.vue
+│          
+├─router
+│      index.js
+│      
+├─store
+│  │  getters.js
+│  │  index.js
+│  │  
+│  └─modules
+│          music.js
+│          
+├─utils
+│      mixin.js
+│      request.js
+│      
+└─views
+    ├─musicList
+    │      MusicList.vue
+    │      
+    ├─player
+    │  │  Player.vue
+    │  │  
+    │  └─components
+    │          m-progress.vue
+    │          
+    ├─rank
+    │      Rank.vue
+    │      
+    ├─recommend
+    │  │  Recommend.vue
+    │  │  
+    │  └─components
+    │          recommend-item.vue
+    │          
+    ├─search
+    │      Search.vue
+    │      
+    ├─searchList
+    │      SearchList.vue
+    │      
+    └─singer
+            Singer.vue
+            
