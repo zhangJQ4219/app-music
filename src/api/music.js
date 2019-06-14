@@ -20,6 +20,25 @@ export function getRecommend () {
     method: 'get'
   })
 }
+
+// 某一推荐列表歌曲
+export function getRecommendSongs (params) {
+  return request({
+    url: '/getRecommendSongs',
+    method: 'get',
+    params
+  })
+}
+
+// 获取歌手列表
+export function getSingerList (params) {
+  return request({
+    url: '/getSingerList',
+    method: 'get',
+    params
+  })
+}
+
 // 获取榜单前三数据
 export function getRankList () {
   return request({

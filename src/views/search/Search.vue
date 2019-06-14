@@ -270,7 +270,7 @@ export default {
         @include ellipsis();
         .search-item-icon{
           display: inline-block;
-          padding: rem(16);
+          padding: rem(10) rem(16);
         }
         & /deep/ .search-result{
           color: $app-color;

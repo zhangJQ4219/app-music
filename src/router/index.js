@@ -12,7 +12,12 @@ export default new Router({
     {
       path: '/recommend',
       name: 'recommend',
-      component: () => import('../views/recommend/Recommend.vue')
+      component: () => import('../views/recommend/Recommend.vue'),
+      children: [{
+        path: ':id',
+        name: 'cdList',
+        component: () => import('../views/cdList/CdList.vue')
+      }]
     },
     {
       path: '/search',

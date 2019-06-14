@@ -8,7 +8,8 @@ const music = {
     playing: false, // 是否播放
     rankListDetails: [],
     playList: [], // 播放列表
-    musicList: {}, // 排行榜歌曲列表
+    musicList: {}, // 排行榜歌曲列表详情介绍
+    cdList: {}, // 推荐歌曲列表详情介绍
     fullScreen: false, // 是否全屏
     currentIndex: -1, // 当前歌曲索引
     mode: playMode.sequence, // 播放模式,
@@ -23,6 +24,9 @@ const music = {
     },
     SET_MUSIC_LIST (state, list) {
       state.musicList = list
+    },
+    SET_CD_LIST (state, list) {
+      state.cdList = list
     },
     SET_FULL_SCREEN (state, value) {
       state.fullScreen = value
@@ -62,6 +66,12 @@ const music = {
     SET_MUSIC_LIST ({ commit }, list) {
       return new Promise((resolve, reject) => {
         commit('SET_MUSIC_LIST', list)
+        resolve()
+      })
+    },
+    SET_CD_LIST ({ commit }, list) {
+      return new Promise((resolve, reject) => {
+        commit('SET_CD_LIST', list)
         resolve()
       })
     },

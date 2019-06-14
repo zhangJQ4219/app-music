@@ -5,74 +5,41 @@
       <span>歌手</span>
       <div class="fontFamily icon">&#xe638;</div>
     </div>
-    <div class="singer-wrapper">
-      <p class="text">快出去，我还没写好</p>
+    <div class="singer-wrpper">
+      <van-index-bar>
+        <div v-for="(item, index) in singerList" :key="index" >
+            <van-index-anchor :index="item.title" />
+            <div class="singer-list" v-for="(val, key) in item.list" :key="key">
+              <div class="singer-pic">
+                <img width="80px" v-lazy="val.singer_pic" alt="">
+              </div>
+              <span>{{val.singer_name}}</span>
+            </div>
+        </div>
+      </van-index-bar>
     </div>
-    <!-- <cube-index-list
-      :data="cityData">
-      <cube-index-list-group
-        v-for="(group, index) in cityData"
-        :key="index"
-        :group="group">
-        <cube-index-list-item
-          v-for="(item, index) in group.items"
-          :key="index"
-          :item="item"
-          @select="selectItem">
-          <div class="custom-item">
-            <img src="https://y.gtimg.cn/music/photo_new/T001R300x300M000002J4UUk29y8BY.jpg?max_age=2592000" alt="">
-            <span>薛之谦</span>
-            <div class="fontFamily history-icon">&#xe600;</div>
-          </div>
-        </cube-index-list-item>
-      </cube-index-list-group>
-    </cube-index-list> -->
   </div>
 </template>
 
 <script>
-// import { getSearch, getRankListDetails, getSongUrl } from 'api/music'
+import { getSingerList } from 'api/music'
+import { selectList } from '@/utils/select'
 export default {
   data () {
     return {
       title: 'Current City: BEIJING',
-      cityData: [
-        {
-          'name': '★Hot City',
-          'items': [
-            {
-              'name': 'BEIJING',
-              'value': 1
-            },
-            {
-              'name': 'SHANGHAI',
-              'value': 2
-            }
-          ]
-        },
-        {
-          'name': 'A',
-          'items': [
-            {
-              'name': 'ANSHAN',
-              'value': 3
-            },
-            {
-              'name': 'ANQING',
-              'value': 4
-            }
-          ]
-        }
-      ]
+      singerList: []
     }
   },
   created () {
-    // let key = {
-    //   'id': 26,
-    //   'time': '2019-05-30'
-    // }
-    // getRankListDetails(key).then(res => {
-    // })
+    getSingerList().then(res => {
+      let list = res.data.singerList.data.singerlist
+      let hot = [{ title: '热门',
+        list: list.slice(0, 5)
+      }]
+      this.singerList = hot.concat(selectList(list))
+      console.log(this.singerList)
+    })
   },
   methods: {
     selectItem () {
@@ -87,8 +54,12 @@ export default {
 
 <style lang='scss' scoped>
 @import '~/style/variables.scss';
+.singer-wrapper /deep/ .van-index-anchor--sticky{
+  top: rem(200)
+}
   .title{
     position: relative;
+    z-index: 2;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -105,14 +76,12 @@ export default {
     }
   }
   .singer-wrapper{
-    position: relative;
+    // margin
+    margin-top: rem(200);
+    overflow: hidden;
     width: 100%;
-    height: rem(300);
-    .text{
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%)
+    .singer-pic{
+      width: rem(80);
     }
   }
 </style>

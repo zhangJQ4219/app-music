@@ -12,7 +12,7 @@ import './assets/style/border.css'
 import fastclick from 'fastclick'
 // 引入iconfont
 import './assets/iconfont/iconfont.css'
-import { Swipe, SwipeItem, Lazyload, Dialog } from 'vant'
+import { Swipe, SwipeItem, Lazyload, Dialog, IndexBar, IndexAnchor } from 'vant'
 
 Vue.use(Lazyload, {
   preLoad: 1.3,
@@ -20,7 +20,7 @@ Vue.use(Lazyload, {
   loading: require('./assets/load/loading.jpg'),
   attempt: 1
 })
-Vue.use(Swipe).use(SwipeItem).use(Lazyload).use(Dialog)
+Vue.use(Swipe).use(SwipeItem).use(Lazyload).use(Dialog).use(IndexBar).use(IndexAnchor)
 
 fastclick.attach(document.body)
 

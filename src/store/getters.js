@@ -3,6 +3,7 @@ const getters = {
   rankListDetails: state => state.music.rankListDetails,
   playList: state => state.music.playList,
   musicList: state => state.music.musicList,
+  cdList: state => state.music.cdList,
   fullScreen: state => state.music.fullScreen,
   currentIndex: state => state.music.currentIndex,
   mode: state => state.music.mode,

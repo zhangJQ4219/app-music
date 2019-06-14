@@ -32,6 +32,7 @@
         <recommend-item :list="item" v-for="(item, index) in list" :key="index"></recommend-item>
       </div>
     </div>
+    <router-view></router-view>
   </div>
 </template>
 

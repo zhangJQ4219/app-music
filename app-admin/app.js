@@ -1,7 +1,5 @@
 var express = require('express')
 const request = require('request')
-const axios = require('axios')
-var url = require('url')
 var app = express()
 var allowCrossDomain = function (req, res, next) {
   res.header('Access-Control-Allow-Origin', 'https://y.qq.com')
@@ -13,6 +11,7 @@ var allowCrossDomain = function (req, res, next) {
 let rec = require('./rec')
 app.use(allowCrossDomain)
 app.use(express.static('./dist'))
+
 // 获取轮播图数据
 app.get('/getSlider', (req, res) => {
   let url = 'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg?_=1558784510324&g_tk=5381&uin=0&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1'
@@ -25,6 +24,7 @@ app.get('/getSlider', (req, res) => {
     }
   })
 })
+
 // 获取推荐数据
 app.get('/getRecommend', (req, response) => {
   Promise.all([rec.rec1(), rec.rec2(), rec.rec3(), rec.rec4(), rec.rec5(), rec.rec6()]).then(res => {
@@ -34,6 +34,89 @@ app.get('/getRecommend', (req, response) => {
       data: res
     }
     response.json(data)
+  })
+})
+
+// 获取某一推荐歌曲列表
+app.get('/getRecommendSongs', (req, res) => {
+  let url = `https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg?type=1&json=1&utf8=1&onlysong=0&new_format=1&disstid=${req.query.tid}&g_tk=1278012111&loginUin=851981243&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0`
+  request({
+    url: url,
+    method: 'GET',
+    headers: {
+      'origin': 'https://y.qq.com',
+      'referer': `https://y.qq.com/n/yqq/playsquare/${req.query.tid}.html`
+    }
+  }, (error, response, body) => {
+    if (!error) {
+      let data = {
+        code: 200,
+        msg: 'success',
+        data: JSON.parse(response.body)
+      }
+      res.json(data)
+    } else {
+      let data = {
+        code: 500,
+        msg: 'failure',
+        data: null
+      }
+      res.json(data)
+    }
+  })
+})
+
+// 获取歌手排名
+app.get('/getSingerList', (req, res) => {
+  let url = `https://u.y.qq.com/cgi-bin/musicu.fcg?-=getUCGI${Math.random() * 10e16}&g_tk=1278012111&loginUin=851981243&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%2C%22cv%22%3A0%7D%2C%22singerList%22%3A%7B%22module%22%3A%22Music.SingerListServer%22%2C%22method%22%3A%22get_singer_list%22%2C%22param%22%3A%7B%22area%22%3A-100%2C%22sex%22%3A-100%2C%22genre%22%3A-100%2C%22index%22%3A-100%2C%22sin%22%3A0%2C%22cur_page%22%3A1%7D%7D%7D`
+  request({
+    url: url,
+    method: 'GET'
+  }, (error, response, body) => {
+    if (!error) {
+      let data = {
+        code: 200,
+        msg: 'success',
+        data: JSON.parse(response.body)
+      }
+      res.json(data)
+    } else {
+      let data = {
+        code: 500,
+        msg: 'failure',
+        data: null
+      }
+      res.json(data)
+    }
+  })
+})
+
+// 获取歌曲url
+app.get('/getSongUrl', (req, res) => {
+  let url = `https://u.y.qq.com/cgi-bin/musicu.fcg?-=getplaysongvkey${Math.random() * 10e16}&g_tk=1278012111&loginUin=851981243&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22req_0%22%3A%7B%22module%22%3A%22vkey.GetVkeyServer%22%2C%22method%22%3A%22CgiGetVkey%22%2C%22param%22%3A%7B%22guid%22%3A%229361190287%22%2C%22songmid%22%3A%5B%22${req.query.songmid}%22%5D%2C%22songtype%22%3A%5B0%5D%2C%22uin%22%3A%22851981243%22%2C%22loginflag%22%3A1%2C%22platform%22%3A%2220%22%7D%7D%2C%22comm%22%3A%7B%22uin%22%3A851981243%2C%22format%22%3A%22json%22%2C%22ct%22%3A24%2C%22cv%22%3A0%7D%7D`
+  request({
+    url: url,
+    method: 'GET',
+    headers: {
+      'origin': 'https://y.qq.com',
+      'referer': 'https://y.qq.com/portal/player.html'
+    }
+  }, (error, response, body) => {
+    if (!error) {
+      let data = {
+        code: 200,
+        msg: 'success',
+        data: JSON.parse(response.body).req_0.data
+      }
+      res.json(data)
+    } else {
+      let data = {
+        code: 500,
+        msg: 'failure',
+        data: null
+      }
+      res.json(data)
+    }
   })
 })
 

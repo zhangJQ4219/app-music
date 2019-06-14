@@ -38,6 +38,7 @@ export default {
   created () {
     // 获取排行榜数据
     getRankList().then(res => {
+      console.log(res)
       // this.rankList = res.data.topList
       this.rankList = res.data.topList
     })

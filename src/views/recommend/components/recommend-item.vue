@@ -11,7 +11,7 @@
       class="horizontal-scroll-list-wrap"> -->
     <m-scroll :data="list.list" :scrollX="true" class="wrapper">
       <ul class="list-wrapper">
-        <li v-for="item in list.list" class="list-item" :key="item.content_id">
+        <li v-for="item in list.list" class="list-item" :key="item.content_id" @click="toCdList(item)">
           <div class="item">
             <div class="play">
               <div class="fontFamily play-icon">&#xe608; {{item.access_num | getNum}}</div>
@@ -52,6 +52,13 @@ export default {
       } else {
         return value
       }
+    }
+  },
+  methods: {
+    toCdList (item) {
+      item.tid = item.content_id ? item.content_id : item.tid
+      this.$store.commit('SET_CD_LIST', item)
+      this.$router.push({ name: 'cdList', params: { id: item.tid } })
     }
   }
 }
@@ -112,9 +119,10 @@ export default {
             border-radius: rem(8);
           }
           p{
-            height: rem(40);
+            height: rem(32);
             margin-top: rem(8);
             white-space: normal;
+            font-size: rem(13);
             line-height: rem(16);
             display: -webkit-box;
             -webkit-line-clamp: 2;
