@@ -5,19 +5,20 @@
       <span>歌手</span>
       <div class="fontFamily icon">&#xe638;</div>
     </div>
-    <div class="singer-wrpper">
+    <div class="singer-wrapper">
       <van-index-bar>
         <div v-for="(item, index) in singerList" :key="index" >
             <van-index-anchor :index="item.title" />
-            <div class="singer-list" v-for="(val, key) in item.list" :key="key">
+            <div class="singer-list" v-for="(val, key) in item.list" :key="key" @click="toSingerList(val)">
               <div class="singer-pic">
-                <img width="80px" v-lazy="val.singer_pic" alt="">
+                <img width="100%" v-lazy="val.singer_pic" alt="">
               </div>
-              <span>{{val.singer_name}}</span>
+              <span class="singer-name">{{val.singer_name}}</span>
             </div>
         </div>
       </van-index-bar>
     </div>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -47,6 +48,11 @@ export default {
     },
     backRec () {
       this.$router.push('/recommend')
+    },
+    toSingerList (item) {
+      console.log(item)
+      this.$store.commit('SET_SINGER_LIST', item)
+      this.$router.push({ name: 'singerList', params: { id: item.singer_mid } })
     }
   }
 }
@@ -55,11 +61,14 @@ export default {
 <style lang='scss' scoped>
 @import '~/style/variables.scss';
 .singer-wrapper /deep/ .van-index-anchor--sticky{
-  top: rem(200)
+  top: rem(50);
+  background-color: $bg;
 }
   .title{
-    position: relative;
+    position: fixed;
     z-index: 2;
+    width: 100%;
+    background-color: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -77,11 +86,22 @@ export default {
   }
   .singer-wrapper{
     // margin
-    margin-top: rem(200);
+    position: relative;
     overflow: hidden;
+    padding-top: rem(50);
     width: 100%;
-    .singer-pic{
-      width: rem(80);
+    .singer-list{
+      padding: rem(8) rem(16);
+      .singer-pic{
+        width: rem(60);
+        border-radius: 50%;
+        overflow: hidden;
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .singer-name{
+        margin-left: rem(20);
+      }
     }
   }
 </style>

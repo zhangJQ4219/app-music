@@ -1,14 +1,13 @@
 <template>
   <div class="music-list" @touchmove.prevent>
     <div class="fontFamily back-icon" @click="back">&#xe606;</div>
-    <!-- <div class="title">{{title}}</div> -->
-    <div class="bg-img" v-lazy:background-image="cdList.cover_url_small" ref="bgImg">
+    <div class="bg-img" v-lazy:background-image="singerList.singer_pic" ref="bgImg">
     </div>
     <div class="bg-layer" ref="layer"></div>
-    <m-scroll :data="cdListDetails" @scroll="scroll"
+    <m-scroll :data="singerListDetails" @scroll="scroll"
             :listen-scroll="listenScroll" :probe-type="probeType" class="list" ref="list">
       <div class="list-wrapper">
-        <div v-for="(item, index) in cdListDetails" :key="item.songName" @click="playMusic(index, item)" class="music">
+        <div v-for="(item, index) in singerListDetails" :key="item.songName" @click="playMusic(index, item)" class="music">
           <p class="song-name">{{index + 1}} {{item.title}}</p>
           <p class="song-singer">{{item.singers}}·{{item.title}}</p>
         </div>
@@ -19,7 +18,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getRecommendSongs } from 'api/music.js'
+import { getSingerDetail } from 'api/music.js'
 import MScroll from '@/components/m-scroll'
 import { playListMixin } from '@/utils/mixin'
 
@@ -30,7 +29,7 @@ export default {
   },
   data () {
     return {
-      cdListDetails: [],
+      singerListDetails: [],
       title: '',
       scrollY: 0,
       imgHeight: 0
@@ -40,10 +39,11 @@ export default {
     this.probeType = 3
     this.listenScroll = true
     // 刷新返回 上级目录
-    if (!this.cdList.tid) {
-      this.$router.push('/recommend')
+    if (!this.singerList.singer_mid) {
+      this.$router.push('/singer')
     }
     if (this.$route.params.id) {
+      console.log('请求')
       this.getList(this.$route.params.id)
     }
   },
@@ -56,7 +56,7 @@ export default {
     //   return `background-image:url(${this.musicList.cover_url_small})`
     //   // return `background-image:url("http://y.gtimg.cn/music/photo_new/T003R300x300M000002jfbMH2hdGnC.jpg")`
     // },
-    ...mapGetters(['cdList'])
+    ...mapGetters(['singerList'])
   },
   watch: {
     scrollY (newY) {
@@ -90,7 +90,7 @@ export default {
       this.$refs.list.refresh()
     },
     back () {
-      this.$router.push('/recommend')
+      this.$router.push('/singer')
     },
     scroll (pos) {
       this.scrollY = pos.y
@@ -98,22 +98,23 @@ export default {
     // 获取播放列表并存入store
     getList (id) {
       let params = {
-        'tid': id
+        'singer_mid': id
       }
-      getRecommendSongs(params).then(res => {
-        // this.title = res.data.cdlist[0].dissname
-        let list = res.data.cdlist[0].songlist
+      getSingerDetail(params).then(res => {
+        // this.title = res.data.singerlist[0].dissname
+        let list = res.data.singer.data.songlist
+        console.log(res)
         list.forEach(item => {
           item.singers = this._getSinger(item.singer)
           item.imgUrlBig = `https://y.gtimg.cn/music/photo_new/T002R800x800M000${item.album.mid}.jpg?max_age=2592000`
           item.imgUrlSmall = `https://y.gtimg.cn/music/photo_new/T002R90x90M000${item.album.mid}.jpg?max_age=2592000`
         })
-        this.cdListDetails = list
+        this.singerListDetails = list
       })
     },
     // 播放音乐并将信息存入store
     playMusic (index, item) {
-      this.$store.commit('SET_PLAY_LIST', this.cdListDetails)
+      this.$store.commit('SET_PLAY_LIST', this.singerListDetails)
       this.$store.commit('SET_CURRENT_INDEX', index)
       this.$store.commit('SET_FULL_SCREEN', true)
       this.$store.commit('SET_PLAYING', true)

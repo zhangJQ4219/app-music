@@ -39,6 +39,15 @@ export function getSingerList (params) {
   })
 }
 
+// 获取歌手详情
+export function getSingerDetail (params) {
+  return request({
+    url: '/getSingerDetail',
+    method: 'get',
+    params
+  })
+}
+
 // 获取榜单前三数据
 export function getRankList () {
   return request({

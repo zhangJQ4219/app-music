@@ -91,6 +91,35 @@ app.get('/getSingerList', (req, res) => {
   })
 })
 
+// 获取歌手详情
+app.get('/getSingerDetail', (req, res) => {
+  let url = `https://u.y.qq.com/cgi-bin/musicu.fcg?-=getUCGI${Math.random() * 10e16}&g_tk=1269316634&loginUin=851981243&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%2C%22cv%22%3A0%7D%2C%22singer%22%3A%7B%22method%22%3A%22get_singer_detail_info%22%2C%22param%22%3A%7B%22sort%22%3A5%2C%22singermid%22%3A%22${req.query.singer_mid}%22%2C%22sin%22%3A0%2C%22num%22%3A20%7D%2C%22module%22%3A%22music.web_singer_info_svr%22%7D%7D`
+  request({
+    url: url,
+    method: 'GET',
+    headers: {
+      'origin': 'https://y.qq.com',
+      'referer': `https://y.qq.com/n/yqq/singer/${req.query.singer_mid}.html`
+    }
+  }, (error, response, body) => {
+    if (!error) {
+      let data = {
+        code: 200,
+        msg: 'success',
+        data: JSON.parse(response.body)
+      }
+      res.json(data)
+    } else {
+      let data = {
+        code: 500,
+        msg: 'failure',
+        data: null
+      }
+      res.json(data)
+    }
+  })
+})
+
 // 获取歌曲url
 app.get('/getSongUrl', (req, res) => {
   let url = `https://u.y.qq.com/cgi-bin/musicu.fcg?-=getplaysongvkey${Math.random() * 10e16}&g_tk=1278012111&loginUin=851981243&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22req_0%22%3A%7B%22module%22%3A%22vkey.GetVkeyServer%22%2C%22method%22%3A%22CgiGetVkey%22%2C%22param%22%3A%7B%22guid%22%3A%229361190287%22%2C%22songmid%22%3A%5B%22${req.query.songmid}%22%5D%2C%22songtype%22%3A%5B0%5D%2C%22uin%22%3A%22851981243%22%2C%22loginflag%22%3A1%2C%22platform%22%3A%2220%22%7D%7D%2C%22comm%22%3A%7B%22uin%22%3A851981243%2C%22format%22%3A%22json%22%2C%22ct%22%3A24%2C%22cv%22%3A0%7D%7D`

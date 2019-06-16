@@ -42,7 +42,12 @@ export default new Router({
     {
       path: '/singer',
       name: 'singer',
-      component: () => import('../views/singer/Singer.vue')
+      component: () => import('../views/singer/Singer.vue'),
+      children: [{
+        path: ':id',
+        name: 'singerList',
+        component: () => import('../views/singerList/SingerList.vue')
+      }]
     },
     {
       path: '/player',

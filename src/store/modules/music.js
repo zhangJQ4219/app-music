@@ -10,6 +10,7 @@ const music = {
     playList: [], // 播放列表
     musicList: {}, // 排行榜歌曲列表详情介绍
     cdList: {}, // 推荐歌曲列表详情介绍
+    singerList: {}, // 歌手介绍
     fullScreen: false, // 是否全屏
     currentIndex: -1, // 当前歌曲索引
     mode: playMode.sequence, // 播放模式,
@@ -27,6 +28,9 @@ const music = {
     },
     SET_CD_LIST (state, list) {
       state.cdList = list
+    },
+    SET_SINGER_LIST (state, list) {
+      state.singerList = list
     },
     SET_FULL_SCREEN (state, value) {
       state.fullScreen = value

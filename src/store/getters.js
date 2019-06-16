@@ -4,6 +4,7 @@ const getters = {
   playList: state => state.music.playList,
   musicList: state => state.music.musicList,
   cdList: state => state.music.cdList,
+  singerList: state => state.music.singerList,
   fullScreen: state => state.music.fullScreen,
   currentIndex: state => state.music.currentIndex,
   mode: state => state.music.mode,

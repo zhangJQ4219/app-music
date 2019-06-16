@@ -194,6 +194,7 @@ export default {
       padding-top: 70%;
       transform-origin: top;
       background-size: cover;
+      background-position-y: 50%;
     }
     .bg-layer{
       position: relative;
