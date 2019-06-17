@@ -6,7 +6,7 @@
       <div class="fontFamily icon">&#xe638;</div>
     </div>
     <div class="singer-wrapper">
-      <van-index-bar>
+      <van-index-bar :index-list="indexList">
         <div v-for="(item, index) in singerList" :key="index" >
             <van-index-anchor :index="item.title" />
             <div class="singer-list" v-for="(val, key) in item.list" :key="key" @click="toSingerList(val)">
@@ -24,22 +24,20 @@
 
 <script>
 import { getSingerList } from 'api/music'
-import { selectList } from '@/utils/select'
+import SortWord from 'sort-word'
 export default {
   data () {
     return {
-      title: 'Current City: BEIJING',
-      singerList: []
+      singerList: [],
+      indexList: []
     }
   },
   created () {
     getSingerList().then(res => {
       let list = res.data.singerList.data.singerlist
-      let hot = [{ title: '热门',
-        list: list.slice(0, 5)
-      }]
-      this.singerList = hot.concat(selectList(list))
-      console.log(this.singerList)
+      let sortword = new SortWord(list, 'singer_name', true)
+      this.indexList = sortword.indexList
+      this.singerList = sortword.newList
     })
   },
   methods: {
@@ -50,7 +48,6 @@ export default {
       this.$router.push('/recommend')
     },
     toSingerList (item) {
-      console.log(item)
       this.$store.commit('SET_SINGER_LIST', item)
       this.$router.push({ name: 'singerList', params: { id: item.singer_mid } })
     }

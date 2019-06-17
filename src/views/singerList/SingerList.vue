@@ -75,9 +75,11 @@ export default {
         zIndex = 10
         this.$refs.bgImg.style.paddingTop = 0
         this.$refs.bgImg.style.height = '46px'
+        this.$refs.bgImg.style['background-position-y'] = '17.3%'
       } else {
         this.$refs.bgImg.style.paddingTop = '70%'
         this.$refs.bgImg.style.height = 0
+        this.$refs.bgImg.style['background-position-y'] = '50%'
       }
       this.$refs.bgImg.style.zIndex = zIndex
     }
