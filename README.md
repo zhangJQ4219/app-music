@@ -28,10 +28,10 @@ npm版本 ： **v5.6.0**
 
 ---
 
-本项目为app-music, 是一款基于vue2.x的仿QQ音乐的移动端项目。项目中接口数据全部来自QQ音
-__本接口所有数据均来自 QQ 音乐, 仅供学习交流之用,请不要用于商业用途. 如果喜欢请下载 QQ 音乐 APP 畅听.如有侵权请联系QQ: 851981243, 我会第一时间删除~__
+本项目为app-music, 是一款基于vue2.x的仿QQ音乐的移动端项目。项目中接口数据全部来自QQ音（因为接口原因，歌手排行接口可能会加载失败可以多次进入页面尝试）
+__本项目接口所有数据均来自 QQ 音乐, 仅供学习交流之用,请不要用于商业用途. 如果喜欢请下载 QQ 音乐 APP 畅听.如有侵权请联系QQ: 851981243, 我会第一时间删除~__
 
-##### 技术栈
+### 技术栈
 
 ---
 
@@ -68,7 +68,8 @@ __本接口所有数据均来自 QQ 音乐, 仅供学习交流之用,请不要�
 
 ---
 
-运行npm run build 之后 直接将dist文件放在app-admin文件夹下即可
+运行npm run build 之后 直接将dist文件放在app-admin文件夹下即可，在app-admin中运行指令：node app.js
+项目[线上地址](http://47.111.109.0/#/) (可能您访问的时候已经过期)
 
 ### 项目结构
 
@@ -135,6 +136,9 @@ src:
 │      request.js             // axios拦截器
 │      
 └─views
+    ├─cdList                  // 推荐歌曲歌曲列表
+    │      CdList.vue
+    │
     ├─musicList               // 歌曲列表
     │      MusicList.vue
     │      
@@ -159,8 +163,11 @@ src:
     ├─searchList
     │      SearchList.vue    // 搜索列表
     │      
-    └─singer
-            Singer.vue       // 歌手页面（暂未完成）
+    ├─singer
+    │        Singer.vue       // 歌手页面
+    │      
+    └─singerList
+            SingerList.vue    // 歌手歌曲列表  
 ```
 
 ### 项目界面展示
@@ -176,3 +183,6 @@ src:
 
 * lyric
 <img src="https://github.com/zhangJQ4219/Img/blob/master/lyric.jpg" width="300px" />
+
+* singer
+<img src="https://github.com/zhangJQ4219/Img/blob/master/singer.jpg" width="300px" />
